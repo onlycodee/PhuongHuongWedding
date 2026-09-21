@@ -10,6 +10,10 @@ window.WEDDING_CONFIG = {
   showGift: true,
   showGuestbook: true,
 
+  // Hidden mini game (js/game.js), started by popping a falling petal or heart.
+  // mode: 'rush' | 'chase' | 'match' | 'keepup'. lab: true shows the prototype switcher.
+  game: { enabled: true, mode: 'rush', lab: true },
+
   // Wedding ceremony time, used by the countdown
   weddingTime: '2026-10-18T11:00:00+07:00',
 

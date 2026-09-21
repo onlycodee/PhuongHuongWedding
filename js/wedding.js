@@ -810,6 +810,8 @@
           z: rand(0.8, 1), grow: 0, extra
         }));
       });
+      // The hidden mini game (js/game.js) starts from this
+      document.dispatchEvent(new CustomEvent('phw:pop', { detail: { shape: it.shape, x: it.x, y: it.y } }));
     };
 
     const onClick = (e) => {

@@ -20,13 +20,18 @@
     { id: 'truyen-thong', label: 'Đỏ Việt · Vàng cổ' }
   ];
   // Backdrop settings per theme: density, fall speed, opacity,
-  // and mix = share of rose petals / hearts / light dust
+  // and mix = relative share of each falling shape (dust is the only one that cannot be popped)
   const ATM = {
-    'hien-dai':     { density: 0.55, speed: 0.9,  alpha: 0.5,  mix: { rose: 0.5, heart: 0.1, dust: 0.4 } },
-    'sage':         { density: 0.7,  speed: 0.8,  alpha: 0.45, mix: { rose: 0.55, heart: 0.1, dust: 0.35 } },
-    'navy':         { density: 0.4,  speed: 0.6,  alpha: 0.55, mix: { rose: 0.15, heart: 0.05, dust: 0.8 } },
-    'rose':         { density: 0.9,  speed: 0.85, alpha: 0.5,  mix: { rose: 0.5, heart: 0.28, dust: 0.22 } },
-    'truyen-thong': { density: 0.8,  speed: 0.95, alpha: 0.55, mix: { rose: 0.45, heart: 0.25, dust: 0.3 } }
+    'hien-dai':     { density: 0.55, speed: 0.9,  alpha: 0.5,
+                      mix: { rose: 0.38, heart: 0.08, flower: 0.14, star: 0.05, dust: 0.35 } },
+    'sage':         { density: 0.7,  speed: 0.8,  alpha: 0.45,
+                      mix: { rose: 0.4, heart: 0.07, flower: 0.2, star: 0.03, dust: 0.3 } },
+    'navy':         { density: 0.4,  speed: 0.6,  alpha: 0.55,
+                      mix: { rose: 0.1, heart: 0.04, flower: 0.06, star: 0.18, dust: 0.62 } },
+    'rose':         { density: 0.9,  speed: 0.85, alpha: 0.5,
+                      mix: { rose: 0.36, heart: 0.22, flower: 0.2, star: 0.04, dust: 0.18 } },
+    'truyen-thong': { density: 0.8,  speed: 0.95, alpha: 0.55,
+                      mix: { rose: 0.32, heart: 0.2, flower: 0.18, star: 0.08, dust: 0.22 } }
   };
 
   let atm = null;
@@ -492,7 +497,10 @@
 
     // Each shape keeps ONE colour role for its whole life, so particles never flicker between colours.
     // On a theme change every role's colour eases to the new value (0.9s) instead of jumping.
-    const ROLE = { rose: '--wed-accent', heart: '--wed-primary', dust: '--wed-secondary' };
+    const ROLE = {
+      rose: '--wed-accent', heart: '--wed-primary', dust: '--wed-secondary',
+      star: '--wed-accent', flower: '--wed-accent'
+    };
     const toRGB = (v) => {
       const p = document.createElement('span');
       p.style.color = v; document.body.appendChild(p);
@@ -518,22 +526,29 @@
       const mobile = state.w < 640;
       return Math.round(Math.min(mobile ? 26 : 58, (area / 26000) * state.cfg.density));
     };
-    const pickShape = () => {
-      const m = state.cfg.mix, total = m.rose + m.heart + m.dust;
-      let r = Math.random() * total;
-      if ((r -= m.rose) < 0) return 'rose';
-      if ((r -= m.heart) < 0) return 'heart';
-      return 'dust';
+    // Size range (radius in px) per shape
+    const SIZE = {
+      dust: [0.8, 2.2], heart: [3.4, 6.4], rose: [4, 8.4],
+      star: [3.8, 6.8], flower: [4, 7.2]
     };
-    const spawn = (init) => {
-      const sh = pickShape();
+    // Weighted pick from the theme's mix; poppableOnly leaves out dust
+    const pickShape = (poppableOnly) => {
+      const m = state.cfg.mix;
+      const shapes = Object.keys(m).filter((k) => !(poppableOnly && k === 'dust'));
+      let r = Math.random() * shapes.reduce((sum, k) => sum + m[k], 0);
+      for (const k of shapes) if ((r -= m[k]) < 0) return k;
+      return shapes[shapes.length - 1];
+    };
+    const spawn = (init, shape) => {
+      const sh = shape || pickShape();
       const dust = sh === 'dust';
       return {
         shape: sh,
+        grow: 1,                                // newborns from a pop start at 0 and swell in
         x: rand(-0.05, 1.05) * state.w,
         y: init ? rand(-0.1, 1) * state.h : rand(-0.15, -0.02) * state.h,
         z: rand(0.45, 1),                       // depth → parallax
-        r: dust ? rand(0.8, 2.2) : (sh === 'heart' ? rand(3.4, 6.4) : rand(4, 8.4)),
+        r: rand(SIZE[sh][0], SIZE[sh][1]),
         vy: rand(6, 17) * state.cfg.speed,
         sway: rand(10, 34),
         swayT: rand(0, Math.PI * 2),
@@ -558,8 +573,43 @@
       ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
       fill(true);
     };
+    // Outline of each poppable shape around the origin; s is its radius
+    const PATHS = {
+      heart(s) {
+        const w = s * 1.15, h = s * 1.1;
+        ctx.moveTo(0, h);
+        ctx.bezierCurveTo(-w * 1.35, h * 0.1, -w * 0.78, -h * 1.12, 0, -h * 0.4);
+        ctx.bezierCurveTo(w * 0.78, -h * 1.12, w * 1.35, h * 0.1, 0, h);
+      },
+      // rose petal: round tip, pinched base
+      rose(s) {
+        const w = s, h = s * 1.5;
+        ctx.moveTo(0, h);
+        ctx.bezierCurveTo(-w * 0.9, h * 0.42, -w * 1.02, -h * 0.62, 0, -h);
+        ctx.bezierCurveTo(w * 1.02, -h * 0.62, w * 0.9, h * 0.42, 0, h);
+      },
+      // five-pointed star
+      star(s) {
+        for (let i = 0; i < 10; i++) {
+          const ang = -Math.PI / 2 + i * Math.PI / 5, rad = i % 2 ? s * 0.55 : s * 1.3;
+          ctx[i ? 'lineTo' : 'moveTo'](Math.cos(ang) * rad, Math.sin(ang) * rad);
+        }
+        ctx.closePath();
+      },
+      // five-petal blossom: each petal is a loop that leaves and returns to the centre
+      flower(s) {
+        const reach = s * 2, spread = 0.62;
+        for (let k = 0; k < 5; k++) {
+          const ang = -Math.PI / 2 + k * Math.PI * 2 / 5;
+          ctx.moveTo(0, 0);
+          ctx.bezierCurveTo(Math.cos(ang - spread) * reach, Math.sin(ang - spread) * reach,
+            Math.cos(ang + spread) * reach, Math.sin(ang + spread) * reach, 0, 0);
+        }
+      }
+    };
     const draw = (item, alphaMul) => {
-      const a = item.a * (alphaMul == null ? state.level * state.cfg.alpha : alphaMul);
+      const grow = item.grow == null ? 1 : item.grow;
+      const a = item.a * grow * (alphaMul == null ? state.level * state.cfg.alpha : alphaMul);
       if (a <= 0.004) return;
       ctx.save();
       ctx.translate(item.x, item.y);
@@ -571,21 +621,10 @@
       ctx.rotate(item.rot);
       // flip around the vertical axis so shapes seem to tumble in space rather than slide as flat sprites
       const squeeze = 0.42 + 0.58 * Math.abs(Math.cos(item.flip));
-      const s = item.r * item.z;
+      const s = item.r * item.z * (0.35 + 0.65 * grow);
       ctx.scale(squeeze, 1);
       ctx.beginPath();
-      if (item.shape === 'heart') {
-        const w = s * 1.15, h = s * 1.1;
-        ctx.moveTo(0, h);
-        ctx.bezierCurveTo(-w * 1.35, h * 0.1, -w * 0.78, -h * 1.12, 0, -h * 0.4);
-        ctx.bezierCurveTo(w * 0.78, -h * 1.12, w * 1.35, h * 0.1, 0, h);
-      } else {
-        // rose petal: round tip, pinched base
-        const w = s, h = s * 1.5;
-        ctx.moveTo(0, h);
-        ctx.bezierCurveTo(-w * 0.9, h * 0.42, -w * 1.02, -h * 0.62, 0, -h);
-        ctx.bezierCurveTo(w * 1.02, -h * 0.62, w * 0.9, h * 0.42, 0, h);
-      }
+      (PATHS[item.shape] || PATHS.rose)(s);
       ctx.fill();
       ctx.restore();
     };
@@ -605,13 +644,19 @@
         }
       }
       ctx.clearRect(0, 0, state.w, state.h);
-      for (const it of state.items) {
+      for (let i = state.items.length - 1; i >= 0; i--) {
+        const it = state.items[i];
         it.swayT += it.swaySpeed * dt;
         it.x += Math.sin(it.swayT) * it.sway * dt;
         it.y += (it.vy * it.z + state.scrollV * 26 * it.z) * dt;
         it.rot += it.vr * dt;
         it.flip += it.flipSpeed * dt;
-        if (it.y - 30 > state.h || it.x < -80 || it.x > state.w + 80) Object.assign(it, spawn(false));
+        if (it.grow < 1) it.grow = Math.min(1, it.grow + dt * 1.6);
+        if (it.y - 30 > state.h || it.x < -80 || it.x > state.w + 80) {
+          // Shapes added by pops leave for good, so the sky drifts back to its normal density
+          if (it.extra) { state.items.splice(i, 1); continue; }
+          Object.assign(it, spawn(false));
+        }
         draw(it);
       }
       for (let i = state.bursts.length - 1; i >= 0; i--) {
@@ -654,18 +699,30 @@
       }
       return best;
     };
-    // A caught shape pops into a ring of petals, hearts and sparkles, then a new one falls from the top
+    // A caught shape pops into a ring of mixed shapes and sparkles. Two new poppable shapes
+    // swell out of the burst and drift on, so every pop leaves one more thing to catch.
+    const BURST_SHAPES = ['rose', 'dust', 'flower', 'heart', 'dust', 'star', 'rose', 'dust', 'flower'];
+    const MAX_EXTRA = 40;
     const pop = (it) => {
       const n = 24;
       for (let i = 0; i < n; i++) {
         const ang = (i / n) * Math.PI * 2 + rand(-0.25, 0.25), sp = rand(80, 230);
-        const shape = i % 6 === 0 ? 'heart' : (i % 3 === 1 ? 'dust' : 'rose');
+        const shape = BURST_SHAPES[i % BURST_SHAPES.length];
         state.bursts.push({ shape,
           x: it.x, y: it.y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, drag: 1.7,
           r: shape === 'dust' ? rand(1.2, 2.6) : rand(3.6, 8.2), rot: rand(0, 6), vr: rand(-4, 4), flip: rand(0, 6),
           life: rand(.9, 1.7), max: 1.7 });
       }
-      Object.assign(it, spawn(false));
+      state.items.splice(state.items.indexOf(it), 1);
+      [-1, 1].forEach((side, k) => {
+        // The first newborn takes the popped shape's place; the second is an extra, up to a cap
+        const extra = k === 1 || Boolean(it.extra);
+        if (extra && state.items.length >= budget() + MAX_EXTRA) return;
+        state.items.push(Object.assign(spawn(false, pickShape(true)), {
+          x: it.x + side * rand(16, 30), y: it.y + rand(-10, 10),
+          z: rand(0.8, 1), grow: 0, extra
+        }));
+      });
     };
 
     const onClick = (e) => {

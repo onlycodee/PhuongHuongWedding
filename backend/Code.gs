@@ -7,7 +7,7 @@
  *   POST type=rsvp  → upsert one row in "RSVP" (keyed by guestId); a non-empty
  *                     note is also added to "Wishes"
  *   POST type=wish  → append one row to "Wishes"
- *   GET  ?action=wishes → JSON list of visible wishes, newest first
+ *   GET  ?action=wishes → JSON list of visible wishes, in guestbook order (see compareWishes)
  *
  * Moderation: type anything in the "Hidden" column of a wish to take it off the site.
  */
@@ -19,9 +19,10 @@ const SHEETS = {
   },
   wishes: {
     name: 'Wishes',
-    header: ['Created at', 'Name', 'Relation', 'Message', 'Source', 'Hidden']
+    header: ['Created at', 'Name', 'Relation', 'Message', 'Source', 'Hidden', 'Guest ID']
   }
 };
+const TIME_ZONE = 'Asia/Ho_Chi_Minh';
 const LIMITS = { name: 80, relation: 80, message: 500, events: 300, wishesReturned: 200 };
 
 function doGet(e) {
@@ -72,7 +73,7 @@ function saveRsvp(p) {
   else sheet.appendRow(row);
 
   if (note && rowIndex < 0) {
-    getSheet(SHEETS.wishes).appendRow([new Date(), name, 'Khách ' + side.toLowerCase(), note, 'rsvp', '']);
+    getSheet(SHEETS.wishes).appendRow([new Date(), name, 'Khách ' + side.toLowerCase(), note, 'rsvp', '', guestId]);
   }
   return { ok: true, guestId: guestId };
 }
@@ -81,38 +82,95 @@ function saveWish(p) {
   const name = clean(p.name, LIMITS.name);
   const message = clean(p.message, LIMITS.message);
   if (!name || !message) return { ok: false, error: 'Name and message are required' };
-  getSheet(SHEETS.wishes).appendRow([new Date(), name, clean(p.relation, LIMITS.relation), message, 'guestbook', '']);
+  getSheet(SHEETS.wishes).appendRow(
+    [new Date(), name, clean(p.relation, LIMITS.relation), message, 'guestbook', '', clean(p.guestId, 64)]);
   return { ok: true };
 }
 
+/**
+ * Visible wishes in display order (see compareWishes). The author's RSVP is looked up by
+ * guest ID only to rank the wish; attendance itself is never sent to the website.
+ */
 function listWishes() {
   const sheet = getSheet(SHEETS.wishes);
   const last = sheet.getLastRow();
   if (last < 2) return [];
+  const rsvps = rsvpByGuestId();
   const rows = sheet.getRange(2, 1, last - 1, SHEETS.wishes.header.length).getValues();
   const wishes = [];
-  for (let i = rows.length - 1; i >= 0 && wishes.length < LIMITS.wishesReturned; i--) {
-    const r = rows[i];
+  for (const r of rows) {
     if (r[5] || !r[3]) continue; // hidden by the couple, or empty
+    const created = r[0] instanceof Date ? r[0] : null;
+    const rsvp = rsvps[String(r[6])] || { attending: false, days: 0 };
     wishes.push({
       name: String(r[1]),
       relation: String(r[2]),
       message: String(r[3]),
-      createdAt: r[0] instanceof Date ? r[0].toISOString() : ''
+      createdAt: created ? created.toISOString() : '',
+      rank: {
+        words: countWords(String(r[3])),
+        day: created ? Utilities.formatDate(created, TIME_ZONE, 'yyyyMMdd') : '',
+        time: created ? created.getTime() : 0,
+        attending: rsvp.attending,
+        days: rsvp.days
+      }
     });
   }
-  return wishes;
+  wishes.sort(compareWishes);
+  return wishes.slice(0, LIMITS.wishesReturned).map(function (w) {
+    return { name: w.name, relation: w.relation, message: w.message, createdAt: w.createdAt };
+  });
 }
 
-/** Returns the tab, creating it with a bold frozen header on first use. */
+/**
+ * Guestbook order: longer wishes first → sent on a later day first → guests who confirmed
+ * attendance first → guests attending more days first → newest first.
+ * "Sent" is compared by calendar day; exact timestamps never tie, which would leave the
+ * attendance criteria without any effect.
+ */
+function compareWishes(a, b) {
+  return (b.rank.words - a.rank.words)
+    || (a.rank.day < b.rank.day ? 1 : a.rank.day > b.rank.day ? -1 : 0)
+    || (Number(b.rank.attending) - Number(a.rank.attending))
+    || (b.rank.days - a.rank.days)
+    || (b.rank.time - a.rank.time);
+}
+
+function countWords(text) {
+  const words = text.trim().split(/\s+/);
+  return words[0] ? words.length : 0;
+}
+
+/** Number of distinct dates (dd/mm) among the chosen events, e.g. "Tiệc nhà trai 17/10, Lễ vu quy 18/10" → 2. */
+function attendedDays(events) {
+  const dates = String(events).match(/\d{1,2}\/\d{1,2}/g) || [];
+  return dates.filter(function (d, i) { return dates.indexOf(d) === i; }).length;
+}
+
+function rsvpByGuestId() {
+  const sheet = getSheet(SHEETS.rsvp);
+  const last = sheet.getLastRow();
+  const map = {};
+  if (last < 2) return map;
+  const rows = sheet.getRange(2, 1, last - 1, SHEETS.rsvp.header.length).getValues();
+  for (const r of rows) {
+    const attending = r[4] === 'Có';
+    if (r[0]) map[String(r[0])] = { attending: attending, days: attending ? attendedDays(r[6]) : 0 };
+  }
+  return map;
+}
+
+/** Returns the tab, creating it with a bold frozen header on first use (and adding header cells for new columns). */
 function getSheet(def) {
   const book = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = book.getSheetByName(def.name);
   if (!sheet) {
     sheet = book.insertSheet(def.name);
-    sheet.appendRow(def.header);
-    sheet.getRange(1, 1, 1, def.header.length).setFontWeight('bold');
     sheet.setFrozenRows(1);
+  }
+  const header = sheet.getRange(1, 1, 1, def.header.length);
+  if (!header.getCell(1, def.header.length).getValue()) {
+    header.setValues([def.header]).setFontWeight('bold');
   }
   return sheet;
 }

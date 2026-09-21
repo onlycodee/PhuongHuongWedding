@@ -226,9 +226,17 @@
     button.textContent = label;
     return () => { button.disabled = false; button.textContent = original; };
   }
-  function newGuestId() {
-    return (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
-      : Date.now().toString(36) + Math.random().toString(36).slice(2);
+  // One anonymous ID per browser. It lets the backend update a guest's RSVP row on edit
+  // and link their guestbook wishes to that RSVP (used for the guestbook order).
+  function guestId() {
+    let id = store.get('phw-guest-id');
+    if (!id) {
+      try { id = (JSON.parse(store.get('phw-rsvp')) || {}).guestId; } catch (e) {}
+      id = id || ((window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+        : Date.now().toString(36) + Math.random().toString(36).slice(2));
+      store.set('phw-guest-id', id);
+    }
+    return id;
   }
 
   /* ===== One-tap wish presets ===== */
@@ -280,7 +288,6 @@
     const submitBtn = $('[type="submit"]', form);
     const eventsField = $('#rsvp-events');
     const eventBoxes = $$('[name="events"]', form);
-    let guestId = '';
 
     const validateEvents = () => {
       const ok = eventBoxes.some((el) => el.checked);
@@ -288,7 +295,7 @@
       return ok;
     };
     const read = (attending) => ({
-      guestId,
+      guestId: guestId(),
       name: form.elements.name.value.trim(),
       side: form.elements.side.value,
       events: attending ? eventBoxes.filter((el) => el.checked).map((el) => el.value) : [],
@@ -297,7 +304,6 @@
       attending
     });
     const fill = (data) => {
-      guestId = data.guestId || '';
       form.elements.name.value = data.name || '';
       form.elements.side.value = data.side || 'groom';
       form.elements.note.value = data.note || '';
@@ -324,8 +330,7 @@
         if (first) first.focus();
         return;
       }
-      const firstTime = !guestId;
-      if (firstTime) guestId = newGuestId();
+      const firstTime = !store.get('phw-rsvp');
       const data = read(attending);
       error.hidden = true;
       const done = busy(submitBtn, 'Đang gửi…');
@@ -438,7 +443,9 @@
       error.hidden = true;
       const done = busy(submitBtn, 'Đang gửi…');
       try {
-        await api.send(Object.assign({ type: 'wish', website: form.elements.website.value }, wish));
+        await api.send(Object.assign(
+          { type: 'wish', guestId: guestId(), website: form.elements.website.value }, wish));
+        // The backend decides the order; a wish the guest just sent still shows first until reload.
         prepend(wish);
         form.elements.message.value = '';
         form.elements.message.dispatchEvent(new Event('input', { bubbles: true }));

@@ -23,6 +23,11 @@ The `RSVP` and `Wishes` tabs are created automatically on the first submission.
   updates their own row. Sum the `Guests` column for a head count.
 - **Hide a wish:** type anything (e.g. `x`) in the `Hidden` column of the `Wishes` tab.
   It disappears from the website on the next page load.
+- **Guestbook order:** longer wishes first → sent on a later day first → guests who confirmed
+  attendance first → guests attending more days first → newest first. The rule lives in
+  `compareWishes` in `Code.gs`. A wish is linked to its author's RSVP through the `Guest ID`
+  column (one anonymous ID per browser), so a wish sent from a different device than the RSVP
+  ranks as "not confirmed".
 - **Add a wish by hand:** add a row to `Wishes` (the `Message` column must not be empty).
 
 ## Changing the script later
@@ -36,6 +41,10 @@ would have to paste into `js/config.js` again.
 
 - The website only ever reads the wish list (name, relation, message, date).
   RSVP data is never exposed by the script.
-- Free Apps Script quotas (about 20,000 calls per day) are far beyond what a wedding needs.
+- Quotas on a free Gmail account are far beyond what a wedding needs. Google documents no
+  daily cap on web app requests; the limit that matters is 30 requests running at the same
+  moment. Submissions are saved one at a time (about a second each), so only a burst of
+  10 or more guests pressing "send" within the same few seconds would see a retry message.
+  See https://developers.google.com/apps-script/guides/services/quotas
 - The endpoint URL is public, like any form endpoint. The script caps field lengths,
   ignores bots that fill the hidden honeypot field, and neutralises spreadsheet formulas.

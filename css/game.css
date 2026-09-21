@@ -26,6 +26,8 @@
 /* Result card */
 .wed-game-card{position:fixed;left:50%;top:50%;z-index:80;width:min(380px,calc(100vw - 32px));transform:translate(-50%,-50%);padding:26px 24px 22px;text-align:center;background:var(--color-bg);border:1px solid var(--color-accent-2,var(--color-divider));border-radius:var(--radius-md);box-shadow:var(--shadow-lg);animation:wed-game-card .4s cubic-bezier(.2,.9,.3,1.15)}
 .wed-game-card .wed-kicker{margin:0 0 6px}
+.wed-game-title{margin:0;font-family:var(--font-heading);font-size:32px;line-height:1.15}
+.wed-game-meta{margin:-6px 0 16px;font-size:13px;letter-spacing:.04em;color:var(--color-accent-700)}
 .wed-game-final{margin:0;font-family:var(--font-heading);font-size:44px;line-height:1.1}
 .wed-game-msg{margin:10px 0 16px;font-size:14.5px;line-height:1.55}
 .wed-game-card .input{width:100%;margin-bottom:12px;text-align:center}

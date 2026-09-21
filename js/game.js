@@ -4,7 +4,8 @@
  *   - a golden heart drifts across the page now and then; tapping it starts a round
  *   - popping falling petals (wedding.js fires "phw:pop") counts "✦ 1", "✦ 2"; the third pop starts a round
  * Each visit draws one of the mechanics at random.
- * Then a score bar and a countdown slide in. A round that ends below its goal resets the score
+ * A card in the middle of the screen explains the rules; the round only begins when the guest
+ * presses "Bắt đầu". Then a score bar and a countdown slide in. A round that ends below its goal resets the score
  * to 0; a round that reaches the goal can be saved to the leaderboard. The leaderboard section
  * at the end of the page only appears for guests who have played.
  *
@@ -256,8 +257,8 @@
       name: 'Tung hoa cưới', time: 20, goal: 10,
       hint: 'Chạm vào bó hoa để tung nó lên. Giữ hoa không chạm đất đến hết giờ — rơi là mất hết điểm!',
       start(g, origin) {
-        g.bq = { x: clamp(origin.x, 60, g.w - 60), y: clamp(origin.y, 140, g.h * 0.6), vx: rand(-40, 40), vy: -g.h * 0.7, rot: 0, r: 46 };
-        g.gravity = g.h * 1.25;
+        g.bq = { x: g.w / 2, y: g.h * 0.55, vx: rand(-30, 30), vy: -g.h * 0.55, rot: 0, r: 46 };
+        g.gravity = g.h * 0.5;          // the opening toss is in slow motion; the first tap brings normal weight
       },
       update(g, dt) {
         const b = g.bq;
@@ -271,9 +272,9 @@
       tap(g, x, y, slop) {
         const b = g.bq;
         if (Math.hypot(b.x - x, b.y - y) - b.r > slop + 14) return false;
-        b.vy = -g.h * 0.92;
-        b.vx = clamp(b.vx * 0.4 + (b.x - x) * 9, -g.h * 0.5, g.h * 0.5);
-        g.gravity *= 1.03;
+        b.vy = -Math.sqrt(g.gravity * g.h * 0.9);        // always tossed to the same height, however heavy it gets
+        b.vx = clamp(b.vx * 0.4 + (b.x - x) * 7, -g.h * 0.4, g.h * 0.4);
+        g.gravity = Math.max(g.gravity, g.h * 0.85) * 1.04;
         g.add(1);
         g.burst(x, y, colors.accent, 8);
         g.text(b.x, b.y - 30, '+1');
@@ -388,7 +389,31 @@
     hudBarFill.classList.toggle('is-low', g.timeLeft / g.timeMax < 0.3);
   };
 
+  // Rules first: nothing moves until the guest presses "Bắt đầu"
   function start(origin) {
+    if ((g && g.playing) || !card.hidden) return;
+    const def = MODES[mode];
+    pops = 0;
+    removeLure();
+    if (lab) lab.open = false;
+    card.textContent = '';
+    const go = el('button', 'btn btn-primary wed-cta', 'Bắt đầu');
+    go.type = 'button';
+    go.addEventListener('click', () => begin(origin));
+    const later = el('button', 'btn btn-secondary', 'Để sau');
+    later.type = 'button';
+    later.addEventListener('click', () => { card.hidden = true; });
+    const actions = el('div', 'wed-game-actions');
+    actions.append(go, later);
+    card.append(el('p', 'wed-kicker', 'Bạn vừa tìm ra trò chơi bí mật ✦'), el('p', 'wed-game-title', def.name),
+      el('p', 'wed-game-msg', def.hint),
+      el('p', 'wed-game-meta', def.perCatch ? 'Mục tiêu: ' + def.goal + ' trái tim' : def.time + ' giây · Mục tiêu: ' + def.goal + ' điểm'),
+      actions);
+    card.hidden = false;
+    go.focus({ preventScroll: true });
+  }
+
+  function begin(origin) {
     if (g && g.playing) return;
     const def = MODES[mode];
     readColors();
@@ -495,7 +520,7 @@
     const close = () => { card.hidden = true; hud.hidden = true; };
     const again = el('button', 'btn btn-secondary', 'Chơi lại');
     again.type = 'button';
-    again.addEventListener('click', () => start());
+    again.addEventListener('click', () => begin());   // they know the rules by now
     const later = el('button', 'btn btn-secondary', won ? 'Đóng' : 'Để sau');
     later.type = 'button';
     later.addEventListener('click', close);

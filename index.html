@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Việt Phương &amp; Ninh Hương — Lễ thành hôn 18 · 10 · 2026</title>
+<meta name="description" content="Trân trọng kính mời quý vị đến chung vui trong Lễ thành hôn của Việt Phương và Ninh Hương, Chủ Nhật 18/10/2026.">
+<meta property="og:title" content="Việt Phương &amp; Ninh Hương — Lễ thành hôn 18 · 10 · 2026">
+<meta property="og:description" content="Trân trọng kính mời quý vị đến chung vui trong ngày hạnh phúc của hai gia đình.">
+<meta property="og:image" content="assets/photos/wed-hero.webp">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%234f6046' d='M16 28C4 19 3 12 6.5 8.5 9.6 5.4 14 6.6 16 10c2-3.4 6.4-4.6 9.5-1.5C29 12 28 19 16 28z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Be+Vietnam+Pro:wght@200;300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Lora:ital,wght@0,400;1,400&family=Noto+Serif+Display:ital,wght@0,400;0,500;1,400&family=Noto+Serif:wght@400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Great+Vibes&display=swap">
+<link rel="stylesheet" href="css/classical.css">
+<link rel="stylesheet" href="css/wedding.css">
+<script src="js/config.js"></script>
+<script>
+// Gắn theme trước khi vẽ để không bị nháy màu: ?theme= → lựa chọn đã lưu → mặc định trong config
+(function () {
+  var cfg = window.WEDDING_CONFIG || {}, theme = cfg.theme;
+  try {
+    var picked = new URLSearchParams(location.search).get('theme');
+    var saved = cfg.showThemePicker && localStorage.getItem('phw-theme');
+    theme = picked || saved || theme;
+  } catch (e) {}
+  var root = document.documentElement;
+  root.setAttribute('data-wed-theme', theme || 'hien-dai');
+  root.classList.add('js');
+})();
+</script>
+<script src="js/wedding.js" defer></script>
+</head>
+<body>
+
+<nav class="nav wed-nav">
+  <span class="nav-brand">V.Phương &amp; N.Hương</span>
+  <div class="wed-nav-links">
+    <a href="#hai-ho">Hai họ</a>
+    <a href="#chuyen-tinh">Chuyện chúng mình</a>
+    <a href="#su-kien">Sự kiện</a>
+    <a href="#album">Album</a>
+    <a href="#chi-duong">Chỉ đường</a>
+  </div>
+  <a href="#xac-nhan" class="btn btn-primary wed-nav-cta">Xác nhận tham dự</a>
+  <details class="wed-menu">
+    <summary class="btn btn-secondary">Mục lục</summary>
+    <div class="wed-menu-list">
+      <a href="#hai-ho">Hai họ</a>
+      <a href="#chuyen-tinh">Chuyện chúng mình</a>
+      <a href="#su-kien">Sự kiện</a>
+      <a href="#album">Album</a>
+      <a href="#chi-duong">Chỉ đường</a>
+      <a href="#xac-nhan" class="is-cta">Xác nhận tham dự</a>
+    </div>
+  </details>
+</nav>
+
+<div class="wed-atm" aria-hidden="true"><b></b><b></b><b></b></div>
+<canvas class="wed-atm-canvas" aria-hidden="true"></canvas>
+
+<div class="wed-theme-strip" id="theme-strip" hidden>
+  <span>Phong cách thiệp</span>
+</div>
+
+<header class="wed-hero" data-atm="1">
+  <div class="wed-hero-text">
+    <p class="wed-hero-kicker">Thiệp mời · Lễ thành hôn</p>
+    <h1 class="wed-name">Việt Phương</h1>
+    <p class="wed-amp">&amp;</p>
+    <h1 class="wed-name">Ninh Hương</h1>
+    <div class="wed-hero-date"><i></i><span>18 · 10 · 2026</span></div>
+    <p class="wed-lead">Chúng tôi trân trọng kính mời quý vị đến chung vui trong ngày hạnh phúc của hai gia đình — tại Phú Nhiêu, Phú Xuyên, Hà Nội và Tuấn Hưng, Lai Khê, Hải Phòng.</p>
+    <div class="wed-hero-actions">
+      <a href="#xac-nhan" class="btn btn-primary">Xác nhận tham dự</a>
+      <a href="#su-kien" class="btn btn-secondary">Xem lịch trình</a>
+    </div>
+  </div>
+  <figure class="plate wed-hero-photo">
+    <div class="wed-slot" data-slot="wed-hero" data-alt="Ảnh cưới Việt Phương và Ninh Hương" data-eager style="aspect-ratio:1093/1400"><span class="wed-slot-cap">Ảnh cưới dọc</span></div>
+  </figure>
+</header>
+
+<section class="wed-countdown wed-band wed-band--both" id="dem-nguoc">
+  <div class="wed-cd-row wed-reveal" data-reveal>
+    <p class="wed-cd-kicker"><span class="wed-cd-rule"></span>Còn lại đến Lễ thành hôn<span class="wed-cd-rule"></span></p>
+    <p class="wed-cd-when">11:00 AM · Chủ Nhật, 18/10/2026</p>
+    <div class="wed-cd" role="timer" aria-label="Đếm ngược đến Lễ thành hôn">
+      <div class="wed-cd-cell">
+        <p class="wed-cd-num wed-cd-num--days" data-cd="d">—</p>
+        <p class="wed-cd-lbl">Ngày</p>
+      </div>
+      <div class="wed-cd-cell">
+        <p class="wed-cd-num" data-cd="h">—</p>
+        <p class="wed-cd-lbl">Giờ</p>
+      </div>
+      <div class="wed-cd-cell">
+        <p class="wed-cd-num" data-cd="m">—</p>
+        <p class="wed-cd-lbl">Phút</p>
+      </div>
+      <div class="wed-cd-cell">
+        <p class="wed-cd-num wed-cd-sec" data-cd="s">—</p>
+        <p class="wed-cd-lbl">Giây</p>
+      </div>
+    </div>
+    <p class="wed-cd-place">Nhà văn hoá thôn Phú Nhiêu · Phú Xuyên · Hà Nội</p>
+  </div>
+</section>
+
+<section id="hai-ho" class="wed-wrap" data-atm=".7">
+  <p class="wed-kicker wed-head wed-reveal" data-reveal>Hai gia đình</p>
+  <h2 class="wed-title wed-head wed-reveal" data-reveal style="margin-bottom:clamp(28px,4vw,48px)">Nhà trai · Nhà gái</h2>
+  <div class="wed-families">
+    <article class="wed-panel wed-person wed-reveal" data-reveal>
+      <p class="wed-label">Nhà trai</p>
+      <figure class="plate">
+        <div class="wed-slot" data-slot="wed-groom" data-alt="Chú rể Vũ Việt Phương" style="aspect-ratio:4/5"><span class="wed-slot-cap">Ảnh chú rể</span></div>
+      </figure>
+      <h3 class="wed-name">Vũ Việt Phương</h3>
+      <p class="wed-person-role">Chú rể</p>
+      <hr class="hr">
+      <dl class="wed-parents">
+        <dt>Thân phụ</dt>
+        <dd>Ông Vũ Văn Long</dd>
+        <dt>Thân mẫu</dt>
+        <dd>Bà Nguyễn Thị Kim Lan</dd>
+      </dl>
+    </article>
+    <article class="wed-panel wed-person wed-reveal" data-reveal>
+      <p class="wed-label">Nhà gái</p>
+      <figure class="plate">
+        <div class="wed-slot" data-slot="wed-bride" data-alt="Cô dâu Ninh Hương" style="aspect-ratio:4/5"><span class="wed-slot-cap">Ảnh cô dâu</span></div>
+      </figure>
+      <h3 class="wed-name">Ninh Hương</h3>
+      <p class="wed-person-role">Cô dâu</p>
+      <hr class="hr">
+      <dl class="wed-parents">
+        <dt>Thân phụ</dt>
+        <dd>Ông Ninh Văn Tưởng</dd>
+        <dt>Thân mẫu</dt>
+        <dd>Bà Phạm Thị Ngát</dd>
+      </dl>
+    </article>
+  </div>
+</section>
+
+<section id="chuyen-tinh" class="wed-band" data-atm=".55">
+  <div class="wed-wrap wed-wrap--story">
+    <p class="wed-kicker wed-head wed-reveal" data-reveal>Chuyện chúng mình</p>
+    <h2 class="wed-title wed-head wed-reveal" data-reveal style="margin-bottom:14px;letter-spacing:var(--wed-h-space,0)">Từ lần đầu gặp đến ngày nên duyên</h2>
+    <p class="wed-lead wed-head wed-reveal" data-reveal style="max-width:52ch;margin-bottom:clamp(34px,5vw,56px)">Bảy năm, vài chuyến tàu Hà Nội – Hải Phòng, và một lời hẹn cả đời.</p>
+
+    <div class="wed-story">
+      <article class="wed-story-row wed-reveal" data-reveal>
+        <figure class="plate"><div class="wed-slot" data-slot="wed-story-1" data-alt="Lần đầu gặp nhau" style="aspect-ratio:4/3"><span class="wed-slot-cap">Ảnh lần đầu gặp nhau</span></div></figure>
+        <div class="wed-story-text">
+          <p class="wed-story-year">Thu 2019</p>
+          <h3 class="wed-story-title">Lần đầu gặp nhau</h3>
+          <p class="wed-story-body">Một buổi họp nhóm thiện nguyện ở Hà Nội. Phương nhớ chiếc áo dài trắng; Hương chỉ nhớ có người nói nhiều quá.</p>
+        </div>
+      </article>
+
+      <article class="wed-story-row wed-story-alt wed-reveal" data-reveal>
+        <figure class="plate"><div class="wed-slot" data-slot="wed-story-2" data-alt="Những ngày hẹn hò" style="aspect-ratio:4/3"><span class="wed-slot-cap">Ảnh những ngày hẹn hò</span></div></figure>
+        <div class="wed-story-text">
+          <p class="wed-story-year">Xuân 2021</p>
+          <h3 class="wed-story-title">Chuyến tàu cuối tuần</h3>
+          <p class="wed-story-body">Hà Nội – Hải Phòng, tuần nào cũng đi. Yêu xa hoá ra chỉ là học cách chờ nhau đúng giờ tàu.</p>
+        </div>
+      </article>
+
+      <article class="wed-story-row wed-reveal" data-reveal>
+        <figure class="plate"><div class="wed-slot" data-slot="wed-story-3" data-alt="Chuyến đi đầu tiên" style="aspect-ratio:4/3"><span class="wed-slot-cap">Ảnh chuyến đi đầu tiên</span></div></figure>
+        <div class="wed-story-text">
+          <p class="wed-story-year">Hè 2023</p>
+          <h3 class="wed-story-title">Chuyến đi đầu tiên</h3>
+          <p class="wed-story-body">Biển Đồ Sơn, một cơn mưa và hai chiếc áo mưa mỏng. Về đến nhà thì biết chắc là muốn đi cùng nhau lâu hơn.</p>
+        </div>
+      </article>
+
+      <article class="wed-story-row wed-story-alt wed-reveal" data-reveal>
+        <figure class="plate"><div class="wed-slot" data-slot="wed-story-4" data-alt="Ra mắt hai gia đình" style="aspect-ratio:4/3"><span class="wed-slot-cap">Ảnh ra mắt hai gia đình</span></div></figure>
+        <div class="wed-story-text">
+          <p class="wed-story-year">Tết 2025</p>
+          <h3 class="wed-story-title">Ra mắt hai gia đình</h3>
+          <p class="wed-story-body">Mâm cơm tất niên ở Phú Nhiêu, rồi ở Tuấn Hưng. Hai nhà nói chuyện đến khuya như đã quen nhau từ lâu.</p>
+        </div>
+      </article>
+
+      <article class="wed-story-row wed-reveal" data-reveal>
+        <figure class="plate"><div class="wed-slot" data-slot="wed-story-5" data-alt="Lời cầu hôn" style="aspect-ratio:4/3"><span class="wed-slot-cap">Ảnh lời cầu hôn</span></div></figure>
+        <div class="wed-story-text">
+          <p class="wed-story-year">Tháng 4 · 2026</p>
+          <h3 class="wed-story-title">Lời hẹn cả đời</h3>
+          <p class="wed-story-body">Không hoa giấy, không đám đông — chỉ một câu hỏi trong sân nhà và một tiếng “vâng”.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="su-kien" class="wed-band" data-atm=".45">
+  <div class="wed-wrap">
+    <p class="wed-kicker wed-head wed-reveal" data-reveal>Lịch trình</p>
+    <h2 class="wed-title wed-head wed-reveal" data-reveal style="margin-bottom:clamp(28px,4vw,44px)">Bốn buổi lễ, hai ngày</h2>
+
+    <div class="wed-timeline">
+      <article class="wed-tl-row wed-reveal" data-reveal>
+        <div>
+          <p class="wed-tl-time">4:30 PM</p>
+          <p class="wed-tl-date">Thứ Bảy · 17/10/2026</p>
+        </div>
+        <div>
+          <span class="tag tag-accent">Nhà trai</span>
+          <h3 class="wed-tl-title">Tiệc mừng nhà trai</h3>
+          <p class="wed-tl-place">Nhà văn hoá thôn Phú Nhiêu, xã Phú Xuyên, Hà Nội</p>
+        </div>
+        <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+      </article>
+
+      <article class="wed-tl-row wed-reveal" data-reveal>
+        <div>
+          <p class="wed-tl-time">5:00 PM</p>
+          <p class="wed-tl-date">Thứ Bảy · 17/10/2026</p>
+        </div>
+        <div>
+          <span class="tag tag-outline">Nhà gái</span>
+          <h3 class="wed-tl-title">Tiệc mừng nhà gái</h3>
+          <p class="wed-tl-place">Tư gia nhà gái, thôn Tuấn Hưng, xã Lai Khê, TP Hải Phòng</p>
+        </div>
+        <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+      </article>
+
+      <article class="wed-tl-row wed-reveal" data-reveal>
+        <div>
+          <p class="wed-tl-time">7:00 AM</p>
+          <p class="wed-tl-date">Chủ Nhật · 18/10/2026</p>
+        </div>
+        <div>
+          <span class="tag tag-outline">Nhà gái</span>
+          <h3 class="wed-tl-title">Lễ vu quy</h3>
+          <p class="wed-tl-place">Gia đình nhà gái, thôn Tuấn Hưng, xã Lai Khê, TP Hải Phòng</p>
+        </div>
+        <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+      </article>
+
+      <article class="wed-tl-row wed-reveal" data-reveal>
+        <div>
+          <p class="wed-tl-time wed-tl-time--main">11:00 AM</p>
+          <p class="wed-tl-date">Chủ Nhật · 18/10/2026</p>
+        </div>
+        <div>
+          <span class="tag tag-accent">Nhà trai</span>
+          <h3 class="wed-tl-title">Lễ thành hôn</h3>
+          <p class="wed-tl-place">Nhà văn hoá thôn Phú Nhiêu, xã Phú Xuyên, Hà Nội</p>
+        </div>
+        <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="album" class="wed-wrap" data-atm=".18">
+  <p class="wed-kicker wed-head wed-reveal" data-reveal>Album</p>
+  <h2 class="wed-title wed-head wed-reveal" data-reveal style="margin-bottom:clamp(24px,4vw,40px)">Những khoảnh khắc</h2>
+  <div class="wed-album">
+    <figure class="plate wed-wide wed-reveal" data-reveal><div class="wed-slot" data-slot="wed-g1" data-alt="Ảnh cưới" style="aspect-ratio:3/2"><span class="wed-slot-cap">Ảnh ngang</span></div></figure>
+    <figure class="plate wed-reveal" data-reveal><div class="wed-slot" data-slot="wed-g2" data-alt="Ảnh cưới" style="aspect-ratio:3/4"><span class="wed-slot-cap">Ảnh dọc</span></div></figure>
+    <figure class="plate wed-reveal" data-reveal><div class="wed-slot" data-slot="wed-g3" data-alt="Ảnh cưới" style="aspect-ratio:3/4"><span class="wed-slot-cap">Ảnh dọc</span></div></figure>
+    <figure class="plate wed-reveal" data-reveal><div class="wed-slot" data-slot="wed-g4" data-alt="Ảnh cưới" style="aspect-ratio:1/1"><span class="wed-slot-cap">Ảnh vuông</span></div></figure>
+    <figure class="plate wed-wide wed-reveal" data-reveal><div class="wed-slot" data-slot="wed-g5" data-alt="Ảnh cưới" style="aspect-ratio:3/2"><span class="wed-slot-cap">Ảnh ngang</span></div></figure>
+  </div>
+</section>
+
+<section class="wed-band wed-band--both">
+  <figure class="wed-quote wed-reveal" data-reveal>
+    <blockquote>“Yêu nhau là cùng nhìn về một hướng — hôm nay hai gia đình xin được cùng nhìn về một mái nhà.”</blockquote>
+    <figcaption>— Kính mời quý vị cùng hai họ nâng ly</figcaption>
+  </figure>
+</section>
+
+<section id="xac-nhan" class="wed-wrap wed-rsvp" data-atm=".6">
+  <div>
+    <p class="wed-kicker wed-head wed-reveal" data-reveal>Xác nhận tham dự</p>
+    <h2 class="wed-title wed-head wed-reveal" data-reveal>Bạn sẽ đến chứ?</h2>
+    <p class="wed-lead">Vui lòng phản hồi trước ngày 10.10.2026 để hai gia đình chuẩn bị chỗ ngồi được chu đáo.</p>
+  </div>
+
+  <form class="wed-form" id="rsvp-form">
+    <div class="field">
+      <label for="rsvp-name" class="wed-flabel">Họ và tên</label>
+      <input id="rsvp-name" name="name" class="input" type="text" placeholder="Nguyễn Văn A" autocomplete="name" required>
+    </div>
+    <div class="field">
+      <span class="wed-flabel">Bạn là khách của</span>
+      <div class="seg">
+        <label class="seg-opt"><input type="radio" name="side" value="groom" checked>Nhà trai</label>
+        <label class="seg-opt"><input type="radio" name="side" value="bride">Nhà gái</label>
+      </div>
+    </div>
+    <div class="field">
+      <span class="wed-flabel">Bạn dự buổi nào</span>
+      <div class="wed-events">
+        <label class="radio"><input type="checkbox" name="events" value="Tiệc nhà trai 17/10"><span class="wed-box"></span>Tiệc nhà trai — 4:30 PM, 17/10/2026</label>
+        <label class="radio"><input type="checkbox" name="events" value="Tiệc nhà gái 17/10"><span class="wed-box"></span>Tiệc nhà gái — 5:00 PM, 17/10/2026</label>
+        <label class="radio"><input type="checkbox" name="events" value="Lễ vu quy 18/10"><span class="wed-box"></span>Lễ vu quy — 7:00 AM, 18/10/2026</label>
+        <label class="radio"><input type="checkbox" name="events" value="Lễ thành hôn 18/10" checked><span class="wed-box"></span>Lễ thành hôn — 11:00 AM, 18/10/2026</label>
+      </div>
+    </div>
+    <div class="field">
+      <label for="rsvp-note" class="wed-flabel">Lời chúc</label>
+      <textarea id="rsvp-note" name="note" class="input" rows="3" placeholder="Chúc hai bạn trăm năm hạnh phúc…"></textarea>
+    </div>
+    <div class="wed-form-actions">
+      <button type="submit" class="btn btn-primary btn-block wed-cta">Gửi xác nhận</button>
+      <button type="button" class="btn btn-ghost wed-decline" id="rsvp-decline">Tiếc quá, tôi không đi được</button>
+      <p class="wed-form-error" id="rsvp-error" role="alert" hidden>Chưa gửi được phản hồi. Bạn vui lòng thử lại giúp chúng mình nhé.</p>
+    </div>
+  </form>
+
+  <div class="wed-sent" id="rsvp-sent" hidden>
+    <p class="wed-label" id="rsvp-sent-kicker">Hẹn gặp bạn</p>
+    <h3>Cảm ơn <span id="rsvp-sent-name">bạn</span>!</h3>
+    <p class="wed-lead" id="rsvp-sent-body"></p>
+    <button type="button" class="btn btn-secondary" id="rsvp-reset">Sửa phản hồi</button>
+  </div>
+</section>
+
+<section class="wed-band" id="mung-cuoi">
+  <div class="wed-wrap wed-gift">
+    <p class="wed-kicker wed-head wed-reveal" data-reveal>Hộp mừng cưới</p>
+    <h2 class="wed-title wed-head wed-reveal" data-reveal>Gửi lời chúc từ xa</h2>
+    <p class="wed-lead">Sự hiện diện của bạn là niềm vui lớn nhất. Nếu không thể đến, bạn có thể gửi lời chúc qua mã QR dưới đây.</p>
+    <div class="wed-gift-grid">
+      <article class="wed-gift-card wed-reveal" data-reveal data-gift="groom">
+        <div class="wed-slot wed-slot--qr" data-slot="wed-qr-groom" data-alt="Mã QR mừng cưới nhà trai"><span class="wed-slot-cap">Mã QR</span></div>
+        <div>
+          <p class="wed-label">Nhà trai</p>
+          <h3 class="wed-h3">Vũ Việt Phương</h3>
+          <p class="wed-gift-account">Số tài khoản — gia đình cập nhật</p>
+          <button type="button" class="btn btn-ghost" data-copy disabled>Sao chép số tài khoản</button>
+        </div>
+      </article>
+      <article class="wed-gift-card wed-reveal" data-reveal data-gift="bride">
+        <div class="wed-slot wed-slot--qr" data-slot="wed-qr-bride" data-alt="Mã QR mừng cưới nhà gái"><span class="wed-slot-cap">Mã QR</span></div>
+        <div>
+          <p class="wed-label">Nhà gái</p>
+          <h3 class="wed-h3">Ninh Hương</h3>
+          <p class="wed-gift-account">Số tài khoản — gia đình cập nhật</p>
+          <button type="button" class="btn btn-ghost" data-copy disabled>Sao chép số tài khoản</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="chi-duong" class="wed-band" data-atm=".3">
+  <div class="wed-wrap">
+    <p class="wed-kicker wed-head wed-reveal" data-reveal>Chỉ đường</p>
+    <h2 class="wed-title wed-head wed-reveal" data-reveal>Hai địa điểm</h2>
+    <div class="wed-grid">
+      <article class="wed-place wed-reveal" data-reveal>
+        <figure class="plate"><div class="wed-slot" data-slot="wed-map-1" data-alt="Bản đồ Nhà văn hoá thôn Phú Nhiêu" style="aspect-ratio:16/10"><span class="wed-slot-cap">Ảnh chụp bản đồ — Phú Nhiêu</span></div></figure>
+        <h3 class="wed-h3">Nhà văn hoá thôn Phú Nhiêu</h3>
+        <p>Xã Phú Xuyên, Hà Nội · Tiệc 4:30 PM 17/10/2026 &amp; Lễ thành hôn 11:00 AM 18/10/2026</p>
+        <a href="https://maps.google.com" class="btn btn-primary" data-map="phu-nhieu" target="_blank" rel="noopener">Mở Google Maps</a>
+      </article>
+      <article class="wed-place wed-reveal" data-reveal>
+        <figure class="plate"><div class="wed-slot" data-slot="wed-map-2" data-alt="Bản đồ thôn Tuấn Hưng" style="aspect-ratio:16/10"><span class="wed-slot-cap">Ảnh chụp bản đồ — Tuấn Hưng</span></div></figure>
+        <h3 class="wed-h3">Tư gia nhà gái, thôn Tuấn Hưng</h3>
+        <p>Xã Lai Khê, TP Hải Phòng · Tiệc 5:00 PM 17/10/2026 &amp; Lễ vu quy 7:00 AM 18/10/2026</p>
+        <a href="https://maps.google.com" class="btn btn-primary" data-map="tuan-hung" target="_blank" rel="noopener">Mở Google Maps</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="wed-band" id="luu-but">
+  <div class="wed-wrap">
+    <p class="wed-kicker wed-head wed-reveal" data-reveal>Sổ lưu bút</p>
+    <h2 class="wed-title wed-head wed-reveal" data-reveal>Lời chúc của mọi người</h2>
+    <div class="wed-wishes">
+      <article class="card wed-reveal" data-reveal>
+        <p class="card-kicker">Bạn cấp ba</p>
+        <p class="card-title">Minh &amp; Hà</p>
+        <p class="wed-wish">Chúc Phương và Hương trăm năm hạnh phúc, sớm có tin vui!</p>
+      </article>
+      <article class="card wed-reveal" data-reveal>
+        <p class="card-kicker">Đồng nghiệp</p>
+        <p class="card-title">Phòng Kỹ thuật</p>
+        <p class="wed-wish">Cả phòng sẽ có mặt đúng 11:00 AM ngày 18/10/2026. Chúc mừng hai bạn!</p>
+      </article>
+      <article class="card wed-reveal" data-reveal>
+        <p class="card-kicker">Họ hàng Hải Phòng</p>
+        <p class="card-title">Gia đình cô Ngân</p>
+        <p class="wed-wish">Mừng cháu Hương về nhà chồng. Chúc hai con mãi thuận hoà.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="wed-bar">
+  <a href="#xac-nhan" class="btn btn-primary">Xác nhận tham dự</a>
+  <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+</div>
+
+<footer class="wed-footer">
+  <div>
+    <p class="wed-name">Việt Phương <span class="wed-amp">&amp;</span> Ninh Hương</p>
+    <p class="wed-footer-note">18 · 10 · 2026 — Cảm ơn bạn đã ở bên chúng tôi</p>
+  </div>
+</footer>
+
+</body>
+</html>

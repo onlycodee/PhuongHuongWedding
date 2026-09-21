@@ -619,8 +619,14 @@
         b.life -= dt;
         if (b.life <= 0) { state.bursts.splice(i, 1); continue; }
         b.x += b.vx * dt; b.y += b.vy * dt; b.vy += 42 * dt; b.rot += b.vr * dt; b.flip += b.vr * dt;
+        if (b.drag) { const k = Math.max(0, 1 - b.drag * dt); b.vx *= k; b.vy *= k; }
         draw({ shape: b.shape, x: b.x, y: b.y, z: 1, r: b.r, rot: b.rot, flip: b.flip, a: 1 },
              Math.max(b.life / b.max, 0) * 0.8);
+      }
+      // Pointer cursor while the mouse rests on a poppable shape (shapes drift, so re-check every frame)
+      if (state.mouse) {
+        const hit = Boolean(shapeAt(state.mouse.x, state.mouse.y, HIT_SLOP.mouse));
+        if (hit !== state.hovering) { state.hovering = hit; root.classList.toggle('wed-atm-hit', hit); }
       }
     };
     const onScroll = () => {
@@ -635,20 +641,55 @@
     }, { threshold: [0.25, 0.55, 0.85] });
     $$('[data-atm]').forEach((el) => io.observe(el));
 
-    // Clicking a primary button throws a small burst of petals
-    const onClick = (e) => {
-      const btn = e.target.closest && e.target.closest('.btn-primary');
-      if (!btn) return;
-      const r = btn.getBoundingClientRect();
-      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-      for (let i = 0; i < 12; i++) {
-        const ang = rand(-Math.PI, 0), sp = rand(60, 165);
-        state.bursts.push({ shape: i % 3 === 0 ? 'heart' : 'rose',
-          x: cx, y: cy, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
-          r: rand(3.4, 6.5), rot: rand(0, 6), vr: rand(-3, 3), flip: rand(0, 6),
-          life: rand(.8, 1.5), max: 1.5 });
+    // The canvas sits behind the page and ignores the pointer, so falling petals and hearts
+    // are hit-tested by hand. The slop makes the small, drifting shapes easy to catch.
+    const HIT_SLOP = { mouse: 16, touch: 28 };
+    const INTERACTIVE = 'a, button, input, textarea, select, label, summary';
+    const shapeAt = (x, y, slop) => {
+      let best = null, bestDist = slop;
+      for (const it of state.items) {
+        if (it.shape === 'dust') continue;
+        const dist = Math.hypot(it.x - x, it.y - y) - it.r * it.z;
+        if (dist < bestDist) { best = it; bestDist = dist; }
       }
+      return best;
     };
+    // A caught shape pops into a ring of petals, hearts and sparkles, then a new one falls from the top
+    const pop = (it) => {
+      const n = 24;
+      for (let i = 0; i < n; i++) {
+        const ang = (i / n) * Math.PI * 2 + rand(-0.25, 0.25), sp = rand(80, 230);
+        const shape = i % 6 === 0 ? 'heart' : (i % 3 === 1 ? 'dust' : 'rose');
+        state.bursts.push({ shape,
+          x: it.x, y: it.y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, drag: 1.7,
+          r: shape === 'dust' ? rand(1.2, 2.6) : rand(3.6, 8.2), rot: rand(0, 6), vr: rand(-4, 4), flip: rand(0, 6),
+          life: rand(.9, 1.7), max: 1.7 });
+      }
+      Object.assign(it, spawn(false));
+    };
+
+    const onClick = (e) => {
+      if (!e.target.closest) return;
+      // Clicking a primary button throws a small burst of petals
+      const btn = e.target.closest('.btn-primary');
+      if (btn) {
+        const r = btn.getBoundingClientRect();
+        const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        for (let i = 0; i < 12; i++) {
+          const ang = rand(-Math.PI, 0), sp = rand(60, 165);
+          state.bursts.push({ shape: i % 3 === 0 ? 'heart' : 'rose',
+            x: cx, y: cy, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
+            r: rand(3.4, 6.5), rot: rand(0, 6), vr: rand(-3, 3), flip: rand(0, 6),
+            life: rand(.8, 1.5), max: 1.5 });
+        }
+        return;
+      }
+      // Anywhere else that is not a control: pop the petal or heart under the pointer
+      if (e.target.closest(INTERACTIVE)) return;
+      const it = shapeAt(e.clientX, e.clientY, e.pointerType === 'touch' ? HIT_SLOP.touch : HIT_SLOP.mouse);
+      if (it) pop(it);
+    };
+    const onMouseMove = (e) => { state.mouse = { x: e.clientX, y: e.clientY }; };
 
     const configure = (theme) => {
       state.cfg = ATM[theme] || ATM['hien-dai'];
@@ -660,6 +701,7 @@
     addEventListener('resize', resize, { passive: true });
     addEventListener('scroll', onScroll, { passive: true });
     addEventListener('click', onClick);
+    if (matchMedia('(hover: hover)').matches) addEventListener('mousemove', onMouseMove, { passive: true });
     state.raf = requestAnimationFrame(frame);
     return { configure };
   }

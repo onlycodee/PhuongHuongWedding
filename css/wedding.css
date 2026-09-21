@@ -183,6 +183,8 @@ section[id]{scroll-margin-top:72px}
 @keyframes wed-amb-b{to{transform:translate3d(-4vw,-4vh,0) scale(1.14)}}
 @keyframes wed-amb-c{to{transform:translate3d(3vw,-3vh,0) scale(1.08)}}
 .wed-atm-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+/* Set while the mouse rests on a falling petal or heart, which pops when clicked */
+.wed-atm-hit body{cursor:pointer}
 @media (prefers-reduced-motion:reduce){.wed-atm b{animation:none}.wed-atm-canvas{display:none}}
 
 /* ===== Hero ===== */

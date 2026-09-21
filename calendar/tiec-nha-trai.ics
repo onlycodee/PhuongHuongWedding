@@ -1,0 +1,21 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PhuongHuongWedding//Invitation//VI
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:tiec-nha-trai@phuonghuongwedding
+DTSTAMP:20260921T000000Z
+DTSTART:20261017T093000Z
+DTEND:20261017T120000Z
+SUMMARY:Tiệc mừng nhà trai — Việt Phương & Ninh Hương
+LOCATION:Nhà văn hoá thôn Phú Nhiêu\, xã Phú Xuyên\, Hà Nội
+DESCRIPTION:Trân trọng kính mời bạn đến chung vui cùng hai gi
+ a đình.
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tiệc mừng nhà trai — Việt Phương & Ninh Hương
+TRIGGER:-P1D
+END:VALARM
+END:VEVENT
+END:VCALENDAR

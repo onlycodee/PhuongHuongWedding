@@ -1,8 +1,8 @@
-/* Thiệp cưới Việt Phương & Ninh Hương — style của trang.
-   Token và component gốc nằm ở classical.css; file này chỉ thêm theme và layout. */
+/* Việt Phương & Ninh Hương wedding invitation — page styles.
+   Base tokens and components live in classical.css; this file adds the themes and the layout. */
 
-/* Năm bộ màu. Mỗi bộ chỉ khai báo các biến ngữ nghĩa (--wed-*) rồi ánh xạ
-   sang token của design system, nên không có màu nào bị gán cứng trong component. */
+/* Five palettes. Each one only declares the semantic --wed-* variables, which are then
+   mapped onto design-system tokens, so no component hard-codes a colour. */
 :root,[data-wed-theme="hien-dai"]{
   --font-heading:"Playfair Display",Georgia,serif;
   --font-body:"Be Vietnam Pro",system-ui,sans-serif;
@@ -14,7 +14,7 @@
   --wed-primary-tint:#e8ede4;--wed-accent-tint:#f6ece0;
 }
 [data-wed-theme="sage"]{
-  /* Sage Green · Ivory · Antique Gold — thanh lịch, tự nhiên */
+  /* Sage Green · Ivory · Antique Gold — elegant, natural */
   --font-heading:"Cormorant Garamond",Garamond,serif;
   --font-body:"Lora",Georgia,serif;
   --font-heading-weight:500;--wed-body-weight:400;--wed-h-space:.004em;
@@ -25,7 +25,7 @@
   --wed-primary-tint:#eaeee7;--wed-accent-tint:#f6eeda;
 }
 [data-wed-theme="navy"]{
-  /* Deep Navy · Champagne · Ivory — sang trọng, trang trọng */
+  /* Deep Navy · Champagne · Ivory — luxurious, formal */
   --font-heading:"Playfair Display",Georgia,serif;
   --font-body:"Lora",Georgia,serif;
   --font-heading-weight:500;--wed-body-weight:400;--wed-h-space:-.006em;
@@ -36,7 +36,7 @@
   --wed-primary-tint:#e7e9ee;--wed-accent-tint:#f7efdd;
 }
 [data-wed-theme="rose"]{
-  /* Dusty Rose · Burgundy · Cream — lãng mạn, hơi cổ điển */
+  /* Dusty Rose · Burgundy · Cream — romantic, slightly vintage */
   --font-heading:"EB Garamond",Garamond,serif;
   --font-body:"Be Vietnam Pro",system-ui,sans-serif;
   --font-heading-weight:500;--wed-body-weight:300;--wed-h-space:-.004em;
@@ -47,7 +47,7 @@
   --wed-primary-tint:#f4e8ea;--wed-accent-tint:#f9edec;
 }
 [data-wed-theme="truyen-thong"]{
-  /* Đỏ Việt · Ngà ấm · Vàng cổ — truyền thống Việt, tối giản hiện đại */
+  /* Vietnamese red · warm ivory · antique gold — traditional, with modern restraint */
   --font-heading:"Noto Serif Display","Noto Serif",serif;
   --font-body:"Be Vietnam Pro",system-ui,sans-serif;
   --font-heading-weight:500;--wed-body-weight:300;--wed-h-space:-.004em;
@@ -57,7 +57,7 @@
   --wed-primary-deep:#7d1526;--wed-accent-deep:#8a6a25;
   --wed-primary-tint:#f7e8e9;--wed-accent-tint:#f8f0dd;
 }
-/* Ánh xạ biến ngữ nghĩa → token design system (dùng chung cho mọi bộ màu) */
+/* Semantic variables → design-system tokens (shared by every palette) */
 :root{
   --wed-text-muted:color-mix(in srgb,var(--wed-text) 62%,transparent);
   --wed-border:color-mix(in srgb,var(--wed-text) 16%,transparent);
@@ -89,10 +89,11 @@
 
   --wed-gutter:clamp(20px,5vw,72px);
   --wed-soft:color-mix(in srgb,var(--color-text) 78%,transparent);
+  --wed-danger:#a3362a;
 }
 
-/* ===== Nền tảng ===== */
-html{background:var(--color-bg);scroll-behavior:smooth}
+/* ===== Base ===== */
+html{background:color-mix(in srgb,var(--color-bg) 88%,#fff);scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{margin:0;background:transparent;color:var(--color-text);font-family:var(--font-body);font-weight:var(--wed-body-weight,300);transition:background-color .5s ease,color .5s ease;text-wrap:pretty;-webkit-font-smoothing:antialiased}
 [hidden]{display:none!important}
@@ -102,7 +103,7 @@ a.btn,a.btn:hover{text-decoration:none}
 h1,h2,h3,blockquote{letter-spacing:var(--wed-h-space,0)}
 section[id]{scroll-margin-top:72px}
 
-/* Ghi đè component của design system cho hợp nền giấy */
+/* Design-system component overrides that suit the paper-like background */
 .input,.input::placeholder,textarea.input{color:var(--color-text)}
 .input{background:transparent;border-color:var(--color-divider)}
 .input::placeholder{opacity:.5}
@@ -113,7 +114,7 @@ section[id]{scroll-margin-top:72px}
 .tag,.tag-accent,.tag-outline,.tag-neutral{color:var(--color-accent-700);border-color:var(--color-accent)}
 .tag-accent{background:var(--color-accent-100)}
 
-/* ===== Khối dùng chung ===== */
+/* ===== Shared blocks ===== */
 .wed-wrap{max-width:1200px;margin:0 auto;padding:clamp(48px,6vw,88px) var(--wed-gutter)}
 .wed-wrap--story{max-width:1100px}
 .wed-band{border-top:1px solid var(--color-divider)}
@@ -127,11 +128,11 @@ section[id]{scroll-margin-top:72px}
 .wed-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:clamp(22px,4vw,44px)}
 .wed-panel{border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:clamp(22px,3vw,36px)}
 
-/* Tên cô dâu chú rể: chữ ký thư pháp, có hỗ trợ dấu tiếng Việt */
+/* Couple names: a calligraphic script face that supports Vietnamese diacritics */
 .wed-name{font-family:"Great Vibes","Dancing Script",var(--font-heading),cursive;font-weight:400;letter-spacing:.01em;line-height:1.16;white-space:nowrap}
 .wed-amp{font-family:"Great Vibes",var(--font-heading),cursive;font-style:normal;color:var(--color-accent-2)}
 
-/* Ô ảnh: hiện ảnh khai báo trong js/config.js, chưa có ảnh thì là khung chờ */
+/* Photo slot: shows the image set in js/config.js, or a placeholder frame until there is one */
 .wed-slot{position:relative;display:block;width:100%;overflow:hidden;background:rgba(127,127,127,.08)}
 .wed-slot img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover}
 .wed-slot-cap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-size:13px;line-height:1.3;font-weight:500;letter-spacing:.01em;color:color-mix(in srgb,currentColor 75%,transparent);border:1.5px dashed color-mix(in srgb,currentColor 35%,transparent)}
@@ -140,40 +141,44 @@ section[id]{scroll-margin-top:72px}
 .wed-slot--qr .wed-slot-cap{border-radius:4px}
 .wed-slot--qr img{object-fit:contain}
 
-/* Hiện dần khi cuộn tới — chỉ ẩn khi JS đã chạy (class .js trên <html>) */
+/* Reveal on scroll — content is only hidden once JS is running (.js class on <html>) */
 .js .wed-reveal{opacity:0;transform:translateY(9px);transition:opacity 1.15s cubic-bezier(.33,.72,.3,1),transform 1.15s cubic-bezier(.33,.72,.3,1)}
 .js .wed-reveal.wed-in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.js .wed-reveal,.js .wed-reveal.wed-in{opacity:1;transform:none;transition:none}}
 @keyframes vpnh-rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-/* ===== Thanh điều hướng ===== */
+/* ===== Navigation ===== */
 .wed-nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--color-bg) 92%,transparent);backdrop-filter:blur(8px);gap:clamp(12px,2.5vw,28px);padding:12px var(--wed-gutter)}
-.wed-nav .nav-brand{font-size:19px;letter-spacing:.02em}
+.wed-nav .nav-brand{font-size:19px;letter-spacing:.02em;white-space:nowrap}
 .wed-nav-links{display:flex;align-items:center;gap:clamp(14px,2.2vw,26px)}
-.wed-nav-links a{font-size:13.5px;letter-spacing:.04em;color:var(--color-text)}
-.wed-menu{display:none;position:relative}
-.wed-menu summary{list-style:none;cursor:pointer;min-height:44px;padding-inline:16px}
-.wed-menu summary::-webkit-details-marker{display:none}
-.wed-menu summary::marker{content:""}
-.wed-menu-list{position:absolute;right:0;top:calc(100% + 10px);min-width:220px;background:var(--color-bg);border:1px solid var(--color-divider);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:8px;display:grid;gap:2px;z-index:30}
-.wed-menu-list a{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:var(--radius-sm);font-size:15px;color:var(--color-text)}
-.wed-menu-list a.is-cta{color:var(--color-accent-700)}
+.wed-nav-links a{font-size:13.5px;letter-spacing:.04em;color:var(--color-text);white-space:nowrap}
+.wed-menu{display:none}
+.wed-menu summary{min-height:44px;padding-inline:16px}
 
-/* ===== Chọn phong cách thiệp ===== */
+/* Popover built on <details>: the mobile nav menu and the "add to calendar" menus */
+.wed-pop{position:relative}
+.wed-pop summary{list-style:none;cursor:pointer}
+.wed-pop summary::-webkit-details-marker{display:none}
+.wed-pop summary::marker{content:""}
+.wed-pop-list{position:absolute;right:0;top:calc(100% + 10px);min-width:220px;background:var(--color-bg);border:1px solid var(--color-divider);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:8px;display:grid;gap:2px;z-index:30}
+.wed-pop-list a{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:var(--radius-sm);font-size:15px;color:var(--color-text)}
+.wed-pop-list a.is-cta{color:var(--color-accent-700)}
+
+/* ===== Theme picker ===== */
 .wed-theme-strip{display:flex;flex-wrap:wrap;align-items:center;gap:10px clamp(10px,2vw,16px);padding:12px var(--wed-gutter);border-bottom:1px solid var(--color-divider);background:var(--color-surface)}
 .wed-theme-strip > span{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 58%,transparent)}
-.wed-theme-chip{cursor:pointer;background:transparent;font-family:var(--font-body);font-size:12.5px;letter-spacing:.03em;padding:7px 14px;min-height:36px;border:1px solid var(--color-divider);border-radius:100px;color:color-mix(in srgb,var(--color-text) 70%,transparent);transition:border-color .3s ease,color .3s ease}
-.wed-theme-chip:hover{border-color:var(--color-accent);color:var(--color-accent-700)}
-.wed-theme-chip:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
-.wed-theme-chip[aria-pressed="true"]{border-color:var(--color-accent);color:var(--color-accent-700);background:var(--color-accent-100)}
+.wed-theme-chip,.wed-preset{cursor:pointer;background:transparent;font-family:var(--font-body);font-size:12.5px;letter-spacing:.03em;padding:7px 14px;min-height:36px;border:1px solid var(--color-divider);border-radius:100px;color:color-mix(in srgb,var(--color-text) 70%,transparent);transition:border-color .3s ease,color .3s ease}
+.wed-theme-chip:hover,.wed-preset:hover{border-color:var(--color-accent);color:var(--color-accent-700)}
+.wed-theme-chip:focus-visible,.wed-preset:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+.wed-theme-chip[aria-pressed="true"],.wed-preset[aria-pressed="true"]{border-color:var(--color-accent);color:var(--color-accent-700);background:var(--color-accent-100)}
 
-/* ===== Nền động: 3 lớp — ánh sáng môi trường, hạt bụi sáng, cánh hoa/lá =====
-   Màu và mật độ đều đọc từ biến theme, nên đổi theme là nền đổi theo. */
+/* ===== Animated backdrop: ambient light blobs plus a canvas of petals, hearts and dust =====
+   Colours and density are read from the theme variables, so the backdrop follows the theme. */
 .wed-atm{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;contain:strict}
 .wed-atm b{position:absolute;display:block;border-radius:50%;will-change:transform}
-.wed-atm b:nth-child(1){width:60vw;height:60vw;left:-14vw;top:-16vw;background:radial-gradient(circle,color-mix(in srgb,var(--wed-primary) 16%,transparent),transparent 68%);animation:wed-amb-a 52s ease-in-out infinite alternate}
-.wed-atm b:nth-child(2){width:50vw;height:50vw;right:-12vw;top:22vh;background:radial-gradient(circle,color-mix(in srgb,var(--wed-accent) 22%,transparent),transparent 68%);animation:wed-amb-b 68s ease-in-out infinite alternate}
-.wed-atm b:nth-child(3){width:68vw;height:68vw;left:16vw;bottom:-26vw;background:radial-gradient(circle,color-mix(in srgb,var(--wed-secondary) 16%,transparent),transparent 70%);animation:wed-amb-c 84s ease-in-out infinite alternate}
+.wed-atm b:nth-child(1){width:60vw;height:60vw;left:-14vw;top:-16vw;background:radial-gradient(circle,color-mix(in srgb,var(--wed-primary) 8%,transparent),transparent 68%);animation:wed-amb-a 52s ease-in-out infinite alternate}
+.wed-atm b:nth-child(2){width:50vw;height:50vw;right:-12vw;top:22vh;background:radial-gradient(circle,color-mix(in srgb,var(--wed-accent) 11%,transparent),transparent 68%);animation:wed-amb-b 68s ease-in-out infinite alternate}
+.wed-atm b:nth-child(3){width:68vw;height:68vw;left:16vw;bottom:-26vw;background:radial-gradient(circle,color-mix(in srgb,var(--wed-secondary) 8%,transparent),transparent 70%);animation:wed-amb-c 84s ease-in-out infinite alternate}
 @keyframes wed-amb-a{to{transform:translate3d(5vw,3vh,0) scale(1.1)}}
 @keyframes wed-amb-b{to{transform:translate3d(-4vw,-4vh,0) scale(1.14)}}
 @keyframes wed-amb-c{to{transform:translate3d(3vw,-3vh,0) scale(1.08)}}
@@ -191,9 +196,12 @@ section[id]{scroll-margin-top:72px}
 .wed-hero-date span{font-family:var(--font-heading);font-size:clamp(20px,2.2vw,28px);font-feature-settings:'tnum' 1;letter-spacing:.06em}
 .wed-hero-text .wed-lead{margin:20px auto 0;max-width:46ch}
 .wed-hero-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:28px}
-.wed-hero-photo{margin:0;width:100%;max-width:520px;justify-self:center}
+.wed-hero-photo{margin:0;width:100%;max-width:700px;justify-self:center}
+/* Main wedding photo: thin gold frame and a soft shadow so it lifts off the page */
+.plate.wed-hero-plate{position:relative;padding:0;background:transparent;border:1px solid var(--color-accent-2);box-shadow:var(--shadow-lg),0 30px 70px -30px color-mix(in srgb,var(--wed-primary) 40%,transparent)}
+.wed-hero-actions .btn-secondary{min-height:50px}
 
-/* ===== Đếm ngược ===== */
+/* ===== Countdown ===== */
 .wed-cd-row{max-width:960px;margin:0 auto;padding:clamp(40px,6vw,76px) var(--wed-gutter);text-align:center}
 .wed-cd-kicker{display:flex;align-items:center;justify-content:center;gap:16px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--color-accent-700);margin:0 0 18px}
 .wed-cd-rule{flex:1;max-width:120px;height:1px;background:linear-gradient(to right,transparent,var(--color-accent-2))}
@@ -211,7 +219,7 @@ section[id]{scroll-margin-top:72px}
 @media (prefers-reduced-motion:reduce){.wed-cd-sec{animation:none}}
 .wed-cd-place{font-family:var(--font-heading);font-style:italic;font-size:clamp(15px,1.7vw,19px);line-height:1.6;color:color-mix(in srgb,var(--color-text) 72%,transparent);margin:clamp(22px,3vw,30px) 0 0}
 
-/* ===== Hai họ ===== */
+/* ===== The two families ===== */
 .wed-families{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:clamp(24px,4vw,56px)}
 .wed-person{text-align:center;container-type:inline-size}
 .wed-person .wed-label{margin-bottom:18px}
@@ -223,7 +231,7 @@ section[id]{scroll-margin-top:72px}
 .wed-parents dt{color:color-mix(in srgb,var(--color-text) 55%,transparent)}
 .wed-parents dd{margin:0}
 
-/* ===== Chuyện chúng mình ===== */
+/* ===== Our story ===== */
 .wed-story{position:relative;display:grid;gap:clamp(34px,5vw,64px)}
 .wed-story::before{content:"";position:absolute;left:50%;top:6px;bottom:6px;width:1px;background:linear-gradient(to bottom,transparent,var(--color-divider) 8%,var(--color-divider) 92%,transparent)}
 .wed-story-row{display:grid;grid-template-columns:1fr 64px 1fr;align-items:center}
@@ -238,7 +246,7 @@ section[id]{scroll-margin-top:72px}
 .wed-story-body{font-size:15.5px;line-height:1.75;color:var(--wed-soft);margin:0;max-width:40ch}
 .wed-story-alt .wed-story-body{margin-left:auto}
 
-/* ===== Lịch trình ===== */
+/* ===== Schedule ===== */
 .wed-tl-row{display:grid;grid-template-columns:minmax(120px,168px) minmax(0,1fr) auto;gap:clamp(16px,3vw,40px);align-items:start;padding:clamp(22px,3vw,34px) 0;border-top:1px solid var(--color-divider)}
 .wed-tl-row:last-child{border-bottom:1px solid var(--color-divider)}
 .wed-tl-time{font-family:var(--font-heading);font-weight:400;font-size:clamp(28px,3vw,40px);line-height:1;font-feature-settings:'tnum' 1;margin:0}
@@ -248,18 +256,20 @@ section[id]{scroll-margin-top:72px}
 .wed-tl-place{font-size:15.5px;line-height:1.65;color:var(--wed-soft);margin:0;max-width:52ch}
 .wed-tl-row .tag{margin-bottom:10px}
 .wed-tl-row .btn{white-space:nowrap}
+.wed-tl-actions{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.wed-cal summary{width:100%;font-size:13.5px}
 
 /* ===== Album ===== */
 .wed-album{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:clamp(14px,2vw,26px)}
 .wed-album > figure{margin:0}
 .wed-album > .wed-wide{grid-column:span 2}
 
-/* ===== Lời trích ===== */
+/* ===== Quote ===== */
 .wed-quote{max-width:1200px;margin:0 auto;padding:clamp(44px,6vw,80px) var(--wed-gutter)}
 .wed-quote blockquote{font-family:var(--font-heading);font-weight:400;font-size:clamp(24px,3vw,38px);line-height:1.35;letter-spacing:-.005em;max-width:38ch;margin:0 auto;text-align:center}
 .wed-quote figcaption{font-size:15.5px;line-height:1.7;color:color-mix(in srgb,var(--color-text) 65%,transparent);margin:clamp(24px,3vw,40px) 0 0;text-align:center}
 
-/* ===== Xác nhận tham dự ===== */
+/* ===== RSVP ===== */
 .wed-rsvp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:clamp(28px,5vw,64px);align-items:start}
 .wed-rsvp .wed-title{margin-bottom:18px}
 .wed-rsvp .wed-lead{max-width:44ch}
@@ -272,17 +282,29 @@ section[id]{scroll-margin-top:72px}
 .radio input:focus-visible + .wed-box{outline:2px solid var(--color-accent);outline-offset:2px}
 .wed-form textarea.input{min-height:84px}
 .wed-form-actions{display:grid;gap:12px;margin-top:2px}
-.wed-cta{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-bg);min-height:50px;font-size:15px;letter-spacing:.06em}
-.wed-cta:hover{background:var(--color-accent-700);border-color:var(--color-accent-700);color:var(--color-bg);box-shadow:0 0 0 4px color-mix(in srgb,var(--wed-accent) 26%,transparent)}
+/* Confirm button: filled with the primary colour — the single strong accent on the page.
+   .btn.wed-cta outranks ".nav a", so the nav CTA keeps these colours too. */
+.btn.wed-cta{background:var(--wed-primary);border-color:var(--wed-primary);color:var(--wed-background);padding-inline:28px;min-height:50px;font-size:15px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;box-shadow:0 10px 28px -12px color-mix(in srgb,var(--wed-primary) 70%,transparent);transition:background-color .3s ease,transform .3s ease,box-shadow .3s ease}
+.btn.wed-cta:hover{background:var(--wed-primary-deep);border-color:var(--wed-primary-deep);color:var(--wed-background);transform:translateY(-1px);box-shadow:0 0 0 4px color-mix(in srgb,var(--wed-accent) 26%,transparent)}
+.btn.wed-nav-cta.wed-cta{min-height:40px;font-size:12.5px;padding-inline:18px;box-shadow:none}
 .wed-decline{justify-self:center;font-size:13.5px;color:color-mix(in srgb,var(--color-text) 62%,transparent);text-decoration:underline;text-underline-offset:3px;min-height:40px}
 .wed-decline:hover{color:var(--color-accent-700);background:transparent}
-.wed-form-error{font-size:13.5px;line-height:1.6;color:var(--color-accent-700);margin:0;text-align:center}
+.wed-form-error,.wed-form-note{font-size:13.5px;line-height:1.6;color:var(--color-accent-700);margin:0;text-align:center}
+.wed-field-error{font-size:13px;line-height:1.5;color:var(--wed-danger);margin:6px 0 0}
+.field.has-error .input{border-color:var(--wed-danger)}
+.field.has-error .wed-box{border-color:var(--wed-danger)}
+.wed-optional{text-transform:none;letter-spacing:.02em;opacity:.8}
+.wed-guests{width:auto;min-width:132px}
+.wed-presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.wed-presets:empty{display:none}
+/* Honeypot for bots: off-screen rather than display:none, which some bots skip */
+.wed-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .wed-sent{border:1px solid var(--color-accent);border-radius:var(--radius-md);padding:clamp(26px,4vw,44px);animation:vpnh-rise .5s ease both;align-self:start}
 .wed-sent .wed-label{color:var(--color-accent-700);margin-bottom:16px}
 .wed-sent h3{font-family:var(--font-heading);font-weight:400;font-size:clamp(26px,3vw,36px);line-height:1.15;margin:0 0 12px}
 .wed-sent .wed-lead{margin-bottom:20px}
 
-/* ===== Hộp mừng cưới ===== */
+/* ===== Gift box ===== */
 .wed-gift .wed-title{margin-bottom:12px}
 .wed-gift > .wed-lead{margin-bottom:clamp(26px,4vw,40px);max-width:52ch}
 .wed-gift-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:clamp(20px,3vw,40px)}
@@ -292,26 +314,34 @@ section[id]{scroll-margin-top:72px}
 .wed-gift-card .wed-h3{line-height:1.2;margin-bottom:8px}
 .wed-gift-account{font-size:14.5px;line-height:1.6;color:color-mix(in srgb,var(--color-text) 65%,transparent);margin:0 0 14px}
 
-/* ===== Chỉ đường ===== */
+/* ===== Directions ===== */
 .wed-place{text-align:center}
 .wed-place figure{margin:0 0 20px}
 .wed-place .wed-h3{margin-bottom:10px}
 .wed-place p{font-size:15.5px;line-height:1.7;color:var(--wed-soft);margin:0 0 16px}
 
-/* ===== Sổ lưu bút ===== */
-.wed-wishes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:clamp(18px,3vw,32px)}
+/* ===== Guestbook ===== */
+.wed-guestbook{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
+.wed-wishes{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));gap:clamp(14px,2vw,24px)}
+.wed-wishes .card{animation:vpnh-rise .5s ease both}
+@media (prefers-reduced-motion:reduce){.wed-wishes .card{animation:none}}
+.wed-wishes .card-kicker{margin:0}
+.wed-wish-status{font-family:var(--font-heading);font-style:italic;font-size:17px;line-height:1.6;color:color-mix(in srgb,var(--color-text) 65%,transparent);margin:0;text-align:center}
+.wed-wishes:not(:empty) + .wed-wish-status{display:none}
+.wed-wish-more{display:flex;margin:clamp(18px,3vw,28px) auto 0}
 .wed-wishes .card-title{margin:0}
 .wed-wish{font-size:15.5px;line-height:1.7;color:var(--wed-soft);margin:0}
 
-/* ===== Thanh hành động trên điện thoại & chân trang ===== */
+/* ===== Mobile action bar & footer ===== */
 .wed-bar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:40;gap:10px;padding:10px 16px;background:color-mix(in srgb,var(--color-bg) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--color-divider)}
 .wed-bar .btn{flex:1;min-height:46px}
+.wed-bar .btn.wed-cta{min-height:50px}
 .wed-footer{border-top:1px solid var(--color-divider)}
 .wed-footer > div{max-width:1200px;margin:0 auto;padding:clamp(36px,5vw,64px) var(--wed-gutter);display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;container-type:inline-size}
 .wed-footer .wed-name{font-size:min(9cqw,44px);margin:0;white-space:normal}
 .wed-footer-note{font-size:13.5px;letter-spacing:.08em;font-feature-settings:'tnum' 1;color:color-mix(in srgb,var(--color-text) 60%,transparent);margin:0}
 
-/* ===== Đỏ Việt: đẩy sắc đỏ thành nhân vật chính — tiêu đề, nút, dải đếm ngược, chân trang ===== */
+/* ===== "truyen-thong" theme: red takes the lead — headings, buttons, countdown band, footer ===== */
 [data-wed-theme="truyen-thong"]{--wed-ivory:#f9f3e7}
 [data-wed-theme="truyen-thong"] h1,[data-wed-theme="truyen-thong"] h2,[data-wed-theme="truyen-thong"] h3,[data-wed-theme="truyen-thong"] blockquote,[data-wed-theme="truyen-thong"] .nav-brand{color:var(--wed-primary-deep)}
 [data-wed-theme="truyen-thong"] .nav{border-top:3px solid var(--wed-primary);border-bottom:1px solid var(--wed-secondary)}
@@ -329,11 +359,16 @@ section[id]{scroll-margin-top:72px}
 [data-wed-theme="truyen-thong"] .tag-accent,[data-wed-theme="truyen-thong"] .tag-outline{border-color:var(--wed-primary);color:var(--wed-primary-deep)}
 
 /* ===== Responsive ===== */
-@media (max-width:860px){
+/* The nav collapses a little before the 860px layout breakpoint: with no-wrap links and the
+   filled CTA, the full bar no longer fits beside the brand below ~960px. */
+@media (max-width:960px){
   .wed-nav-links,.wed-nav-cta{display:none}
   .wed-menu{display:block}
+}
+@media (max-width:860px){
   .wed-tl-row{grid-template-columns:minmax(0,1fr);gap:14px}
-  .wed-tl-row .btn{justify-self:start}
+  .wed-tl-actions{flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px}
+  .wed-cal .wed-pop-list{left:0;right:auto}
 }
 @media (max-width:820px){
   .wed-story{gap:30px}
@@ -342,6 +377,9 @@ section[id]{scroll-margin-top:72px}
   .wed-story-row > figure,.wed-story-alt > figure{grid-column:1;grid-row:1}
   .wed-story-text,.wed-story-alt .wed-story-text{grid-column:1;grid-row:2;text-align:center}
   .wed-story-body,.wed-story-alt .wed-story-body{margin:0 auto}
+}
+@media (max-width:860px){
+  .wed-guestbook{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:760px){
   .wed-album{grid-template-columns:minmax(0,1fr)}
@@ -356,8 +394,8 @@ section[id]{scroll-margin-top:72px}
   .wed-cd-cell + .wed-cd-cell::after{display:none}
   .wed-cd-num{font-size:30px}
   .wed-cd-lbl{font-size:9.5px;letter-spacing:.1em;margin-top:8px}
-  .wed-bar{display:flex}
-  body{padding-bottom:78px}
+  .wed-bar{display:flex;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+  .wed-footer{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
   .wed-gift-card{flex-direction:column;align-items:flex-start}
   .wed-theme-strip{padding-inline:16px;gap:8px}
   .wed-theme-strip > span{width:100%}

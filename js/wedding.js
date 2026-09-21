@@ -19,8 +19,8 @@
     { id: 'rose', label: 'Dusty Rose · Burgundy' },
     { id: 'truyen-thong', label: 'Đỏ Việt · Vàng cổ' }
   ];
-  // Cấu hình nền động theo từng theme: mật độ, tốc độ, độ đậm
-  // mix: tỉ lệ cánh hồng / trái tim / bụi sáng cho từng theme
+  // Backdrop settings per theme: density, fall speed, opacity,
+  // and mix = share of rose petals / hearts / light dust
   const ATM = {
     'hien-dai':     { density: 0.55, speed: 0.9,  alpha: 0.5,  mix: { rose: 0.5, heart: 0.1, dust: 0.4 } },
     'sage':         { density: 0.7,  speed: 0.8,  alpha: 0.45, mix: { rose: 0.55, heart: 0.1, dust: 0.35 } },
@@ -60,7 +60,7 @@
     strip.hidden = false;
   }
 
-  /* ===== Bật/tắt section, ảnh, bản đồ, mừng cưới ===== */
+  /* ===== Optional sections, photos, maps, gift accounts ===== */
   function initSections() {
     const toggle = (sel, on) => { const el = $(sel); if (el && on === false) el.hidden = true; };
     toggle('#dem-nguoc', cfg.showCountdown);
@@ -110,15 +110,7 @@
     }
   }
 
-  /* ===== Menu trên điện thoại ===== */
-  function initMenu() {
-    const menu = $('.wed-menu');
-    if (!menu) return;
-    menu.addEventListener('click', (e) => { if (e.target.closest('a')) menu.open = false; });
-    document.addEventListener('click', (e) => { if (menu.open && !menu.contains(e.target)) menu.open = false; });
-  }
-
-  /* ===== Đếm ngược ===== */
+  /* ===== Countdown ===== */
   function initCountdown() {
     const cells = {};
     for (const el of $$('[data-cd]')) cells[el.getAttribute('data-cd')] = el;
@@ -138,7 +130,7 @@
     tick();
   }
 
-  /* ===== Hiện dần khi cuộn tới ===== */
+  /* ===== Reveal on scroll ===== */
   function initReveal() {
     if (reducedMotion) return;
     const io = new IntersectionObserver((entries) => {
@@ -149,13 +141,13 @@
       }
     }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
     for (const el of $$('[data-reveal]')) {
-      // các phần tử anh em hiện so le nhau 70ms
+      // siblings are staggered by 70ms
       let i = 0, p = el.previousElementSibling;
       while (p) { if (p.hasAttribute('data-reveal')) i++; p = p.previousElementSibling; }
       el.style.transitionDelay = Math.min(i, 4) * 70 + 'ms';
       io.observe(el);
     }
-    // Cuộn nhanh hoặc nhảy theo anchor có thể bỏ qua IntersectionObserver — không để nội dung bị ẩn mãi.
+    // Fast scrolls and anchor jumps can skip IntersectionObserver callbacks — never leave content hidden.
     const sweep = () => {
       for (const el of $$('[data-reveal]:not(.wed-in)')) {
         if (el.getBoundingClientRect().top < innerHeight * 0.94) {
@@ -175,26 +167,143 @@
     addEventListener('hashchange', () => setTimeout(sweep, 350));
   }
 
-  /* ===== Xác nhận tham dự ===== */
+  /* ===== Backend: Google Apps Script web app (backend/Code.gs) =====
+     With no apiEndpoint configured the site runs in demo mode and keeps
+     submissions in this browser only, so every flow can be tried locally. */
+  const api = {
+    async send(payload) {
+      if (!cfg.apiEndpoint) return demoBackend.send(payload);
+      // A form-encoded body keeps this a "simple" CORS request: no preflight, which Apps Script cannot answer.
+      const res = await fetch(cfg.apiEndpoint, { method: 'POST', body: new URLSearchParams(payload) });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    },
+    async wishes() {
+      if (!cfg.apiEndpoint) return demoBackend.wishes();
+      const res = await fetch(cfg.apiEndpoint + '?action=wishes');
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Request failed');
+      return data.wishes || [];
+    }
+  };
+  const demoBackend = {
+    wishes() {
+      try { return JSON.parse(store.get('phw-demo-wishes')) || []; } catch (e) { return []; }
+    },
+    send(p) {
+      const wish = p.type === 'wish'
+        ? { name: p.name, relation: p.relation, message: p.message }
+        : (p.note && p.firstTime ? { name: p.name, relation: '', message: p.note } : null);
+      if (wish) store.set('phw-demo-wishes', JSON.stringify([wish].concat(this.wishes())));
+      return { ok: true };
+    }
+  };
+
+  /* ===== Form helpers ===== */
+  // Shows or clears the inline error of one .field (pass '' to clear)
+  function setFieldError(field, message) {
+    const error = $('.wed-field-error', field);
+    field.classList.toggle('has-error', Boolean(message));
+    error.textContent = message;
+    error.hidden = !message;
+    for (const input of $$('.input, [type="checkbox"]', field)) {
+      if (message) input.setAttribute('aria-invalid', 'true');
+      else input.removeAttribute('aria-invalid');
+    }
+  }
+  function validateName(input) {
+    const name = input.value.trim();
+    const message = !name ? 'Bạn vui lòng cho biết họ tên nhé.'
+      : name.length < 2 ? 'Họ tên cần ít nhất 2 ký tự.' : '';
+    setFieldError(input.closest('.field'), message);
+    return !message;
+  }
+  // Locks the submit button while a request is in flight; returns the unlock function
+  function busy(button, label) {
+    const original = button.textContent;
+    button.disabled = true;
+    button.textContent = label;
+    return () => { button.disabled = false; button.textContent = original; };
+  }
+  function newGuestId() {
+    return (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+      : Date.now().toString(36) + Math.random().toString(36).slice(2);
+  }
+
+  /* ===== One-tap wish presets ===== */
+  function initPresets() {
+    const presets = cfg.wishPresets || [];
+    for (const box of $$('[data-presets-for]')) {
+      const target = document.getElementById(box.getAttribute('data-presets-for'));
+      if (!target) continue;
+      const chips = presets.map((preset) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'wed-preset';
+        chip.textContent = preset.label;
+        chip.addEventListener('click', () => {
+          target.value = preset.text;
+          target.dispatchEvent(new Event('input', { bubbles: true }));
+          target.focus();
+        });
+        box.appendChild(chip);
+        return chip;
+      });
+      // A chip stays highlighted only while the box still holds its exact text
+      target.addEventListener('input', () => chips.forEach((chip, i) =>
+        chip.setAttribute('aria-pressed', String(target.value === presets[i].text))));
+    }
+  }
+
+  /* ===== Popovers: mobile nav menu and "add to calendar" ===== */
+  function initPopovers() {
+    const pops = $$('.wed-pop');
+    for (const pop of pops) {
+      pop.addEventListener('click', (e) => { if (e.target.closest('a')) pop.open = false; });
+      pop.addEventListener('toggle', () => {
+        if (pop.open) pops.forEach((other) => { if (other !== pop) other.open = false; });
+      });
+    }
+    document.addEventListener('click', (e) => {
+      for (const pop of pops) if (pop.open && !pop.contains(e.target)) pop.open = false;
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') pops.forEach((pop) => { pop.open = false; });
+    });
+  }
+
+  /* ===== RSVP ===== */
   function initRsvp() {
     const form = $('#rsvp-form'), sent = $('#rsvp-sent'), error = $('#rsvp-error');
     if (!form || !sent) return;
     const submitBtn = $('[type="submit"]', form);
-    const submitLabel = submitBtn.textContent;
+    const eventsField = $('#rsvp-events');
+    const eventBoxes = $$('[name="events"]', form);
+    let guestId = '';
 
+    const validateEvents = () => {
+      const ok = eventBoxes.some((el) => el.checked);
+      setFieldError(eventsField, ok ? '' : 'Bạn vui lòng chọn ít nhất một buổi tham dự.');
+      return ok;
+    };
     const read = (attending) => ({
+      guestId,
       name: form.elements.name.value.trim(),
       side: form.elements.side.value,
-      events: attending ? $$('[name="events"]:checked', form).map((el) => el.value) : [],
+      events: attending ? eventBoxes.filter((el) => el.checked).map((el) => el.value) : [],
+      guests: attending ? Number(form.elements.guests.value) : 0,
       note: form.elements.note.value.trim(),
       attending
     });
     const fill = (data) => {
+      guestId = data.guestId || '';
       form.elements.name.value = data.name || '';
       form.elements.side.value = data.side || 'groom';
       form.elements.note.value = data.note || '';
       if (data.attending) {
-        for (const el of $$('[name="events"]', form)) el.checked = (data.events || []).includes(el.value);
+        eventBoxes.forEach((el) => { el.checked = (data.events || []).includes(el.value); });
+        form.elements.guests.value = String(data.guests || 1);
       }
     };
     const showSent = (data) => {
@@ -206,32 +315,47 @@
       form.hidden = true;
       sent.hidden = false;
     };
-    const post = (data) => {
-      if (!cfg.rsvpEndpoint) return Promise.resolve();
-      const body = new URLSearchParams({
-        name: data.name,
-        side: data.side === 'bride' ? 'Nhà gái' : 'Nhà trai',
-        events: data.events.join(', '),
-        note: data.note,
-        attending: data.attending ? 'Có' : 'Không'
-      });
-      return fetch(cfg.rsvpEndpoint, { method: 'POST', mode: 'no-cors', body });
-    };
     const respond = async (attending) => {
-      if (!form.reportValidity()) return;
+      // Declining only needs a name; attending also needs at least one event.
+      const nameOk = validateName(form.elements.name);
+      const eventsOk = attending ? validateEvents() : (setFieldError(eventsField, ''), true);
+      if (!nameOk || !eventsOk) {
+        const first = $('.has-error .input, .has-error input', form);
+        if (first) first.focus();
+        return;
+      }
+      const firstTime = !guestId;
+      if (firstTime) guestId = newGuestId();
       const data = read(attending);
       error.hidden = true;
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Đang gửi…';
+      const done = busy(submitBtn, 'Đang gửi…');
       try {
-        await post(data);
+        await api.send({
+          type: 'rsvp',
+          guestId: data.guestId,
+          name: data.name,
+          side: data.side,
+          attending: attending ? 'yes' : 'no',
+          guests: String(data.guests),
+          events: data.events.join(', '),
+          note: data.note,
+          website: form.elements.website.value,
+          firstTime: firstTime ? '1' : ''
+        });
         store.set('phw-rsvp', JSON.stringify(data));
         showSent(data);
+        // The backend copies a first-time note into the guestbook, so show it right away.
+        if (firstTime && data.note) {
+          document.dispatchEvent(new CustomEvent('phw:wish', { detail: {
+            name: data.name,
+            relation: data.side === 'bride' ? 'Khách nhà gái' : 'Khách nhà trai',
+            message: data.note
+          } }));
+        }
       } catch (e) {
         error.hidden = false;
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = submitLabel;
+        done();
       }
     };
 
@@ -241,15 +365,113 @@
       sent.hidden = true;
       form.hidden = false;
     });
+    // Errors clear as soon as the guest fixes the field
+    form.elements.name.addEventListener('input', () => {
+      if (form.elements.name.closest('.field').classList.contains('has-error')) validateName(form.elements.name);
+    });
+    eventsField.addEventListener('change', () => {
+      if (eventsField.classList.contains('has-error')) validateEvents();
+    });
 
-    // Khách quay lại vẫn thấy phản hồi đã gửi
+    // A returning guest sees the answer they already sent
     try {
       const saved = JSON.parse(store.get('phw-rsvp'));
       if (saved) { fill(saved); showSent(saved); }
     } catch (e) { store.del('phw-rsvp'); }
   }
 
-  /* ===== Nền động: cánh hồng, trái tim, bụi sáng trên canvas ===== */
+  /* ===== Guestbook: wishes are loaded from and saved to the backend ===== */
+  function initGuestbook() {
+    const form = $('#wish-form'), list = $('#wish-list');
+    if (!form || !list || cfg.showGuestbook === false) return;
+    const status = $('#wish-status'), more = $('#wish-more');
+    const thanks = $('#wish-thanks'), error = $('#wish-error');
+    const submitBtn = $('[type="submit"]', form);
+    const messageField = form.elements.message.closest('.field');
+    const PAGE = 6;
+    let wishes = [], shown = PAGE;
+
+    const card = (wish) => {
+      const el = document.createElement('article');
+      el.className = 'card';
+      const add = (cls, text) => {
+        const p = document.createElement('p');
+        p.className = cls;
+        p.textContent = text; // textContent, never innerHTML: wishes are untrusted input
+        el.appendChild(p);
+      };
+      if (wish.relation) add('card-kicker', wish.relation);
+      add('card-title', wish.name);
+      add('wed-wish', wish.message);
+      return el;
+    };
+    const render = () => {
+      list.replaceChildren(...wishes.slice(0, shown).map(card));
+      more.hidden = wishes.length <= shown;
+      status.textContent = 'Hãy là người đầu tiên gửi lời chúc tới cô dâu chú rể.';
+    };
+    const prepend = (wish) => { wishes.unshift(wish); render(); };
+    const validateMessage = () => {
+      const message = form.elements.message.value.trim()
+        ? '' : 'Bạn vui lòng viết đôi lời chúc, hoặc chọn một lời chúc có sẵn nhé.';
+      setFieldError(messageField, message);
+      return !message;
+    };
+
+    more.addEventListener('click', () => { shown += PAGE; render(); });
+    document.addEventListener('phw:wish', (e) => prepend(e.detail));
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nameOk = validateName(form.elements.name);
+      const messageOk = validateMessage();
+      if (!nameOk || !messageOk) {
+        $('.has-error .input', form).focus();
+        return;
+      }
+      const wish = {
+        name: form.elements.name.value.trim(),
+        relation: form.elements.relation.value.trim(),
+        message: form.elements.message.value.trim()
+      };
+      thanks.hidden = true;
+      error.hidden = true;
+      const done = busy(submitBtn, 'Đang gửi…');
+      try {
+        await api.send(Object.assign({ type: 'wish', website: form.elements.website.value }, wish));
+        prepend(wish);
+        form.elements.message.value = '';
+        form.elements.message.dispatchEvent(new Event('input', { bubbles: true }));
+        thanks.hidden = false;
+      } catch (err) {
+        error.hidden = false;
+      } finally {
+        done();
+      }
+    });
+    form.elements.name.addEventListener('input', () => {
+      if (form.elements.name.closest('.field').classList.contains('has-error')) validateName(form.elements.name);
+    });
+    form.elements.message.addEventListener('input', () => {
+      if (messageField.classList.contains('has-error')) validateMessage();
+    });
+
+    // Guests who already sent an RSVP don't have to type their name again
+    try {
+      const saved = JSON.parse(store.get('phw-rsvp'));
+      if (saved && saved.name) form.elements.name.value = saved.name;
+    } catch (e) {}
+
+    api.wishes().then((loaded) => {
+      // Keep anything the guest sent while the list was still loading
+      wishes = wishes.concat(loaded);
+      render();
+    }).catch(() => {
+      status.textContent = 'Chưa tải được lời chúc. Bạn thử tải lại trang nhé.';
+    });
+  }
+
+  /* ===== Animated backdrop: rose petals, hearts and light dust on a canvas ===== */
   function initAtmosphere() {
     const canvas = $('.wed-atm-canvas');
     if (!canvas || reducedMotion) return null;
@@ -261,8 +483,8 @@
       colorFrom: null, colorTo: null, colorNow: null, cx: 1
     };
 
-    // Mỗi hình có MỘT vai màu cố định suốt đời → không đổi màu lung tung.
-    // Khi đổi theme, màu của từng vai chuyển mượt (nội suy 0.9s) thay vì nhảy.
+    // Each shape keeps ONE colour role for its whole life, so particles never flicker between colours.
+    // On a theme change every role's colour eases to the new value (0.9s) instead of jumping.
     const ROLE = { rose: '--wed-accent', heart: '--wed-primary', dust: '--wed-secondary' };
     const toRGB = (v) => {
       const p = document.createElement('span');
@@ -303,7 +525,7 @@
         shape: sh,
         x: rand(-0.05, 1.05) * state.w,
         y: init ? rand(-0.1, 1) * state.h : rand(-0.15, -0.02) * state.h,
-        z: rand(0.45, 1),                       // chiều sâu → thị sai
+        z: rand(0.45, 1),                       // depth → parallax
         r: dust ? rand(0.8, 2.2) : (sh === 'heart' ? rand(3.4, 6.4) : rand(4, 8.4)),
         vy: rand(6, 17) * state.cfg.speed,
         sway: rand(10, 34),
@@ -340,7 +562,7 @@
         ctx.restore(); return;
       }
       ctx.rotate(item.rot);
-      // lật quanh trục dọc → cảm giác xoay trong không gian, không phải sprite phẳng
+      // flip around the vertical axis so shapes seem to tumble in space rather than slide as flat sprites
       const squeeze = 0.42 + 0.58 * Math.abs(Math.cos(item.flip));
       const s = item.r * item.z;
       ctx.scale(squeeze, 1);
@@ -351,7 +573,7 @@
         ctx.bezierCurveTo(-w * 1.35, h * 0.1, -w * 0.78, -h * 1.12, 0, -h * 0.4);
         ctx.bezierCurveTo(w * 0.78, -h * 1.12, w * 1.35, h * 0.1, 0, h);
       } else {
-        // cánh hoa hồng: đầu tròn, gốc thắt, mép hơi gợn
+        // rose petal: round tip, pinched base
         const w = s, h = s * 1.5;
         ctx.moveTo(0, h);
         ctx.bezierCurveTo(-w * 0.9, h * 0.42, -w * 1.02, -h * 0.62, 0, -h);
@@ -398,7 +620,7 @@
       const dy = scrollY - state.lastY; state.lastY = scrollY;
       state.scrollV = Math.max(-1.2, Math.min(1.2, state.scrollV + dy / 220));
     };
-    // Mỗi section khai báo data-atm = độ đậm của nền động khi section đó đang trong khung nhìn
+    // Each section sets data-atm: how strong the backdrop is while that section is in view
     const io = new IntersectionObserver((entries) => {
       let best = null;
       for (const e of entries) if (e.isIntersecting && (!best || e.intersectionRatio > best.intersectionRatio)) best = e;
@@ -406,7 +628,7 @@
     }, { threshold: [0.25, 0.55, 0.85] });
     $$('[data-atm]').forEach((el) => io.observe(el));
 
-    // Bấm nút chính → tung một chùm cánh hoa
+    // Clicking a primary button throws a small burst of petals
     const onClick = (e) => {
       const btn = e.target.closest && e.target.closest('.btn-primary');
       if (!btn) return;
@@ -440,9 +662,11 @@
   initPhotos();
   initMaps();
   initGift();
-  initMenu();
+  initPopovers();
+  initPresets();
   initCountdown();
   initReveal();
   initRsvp();
+  initGuestbook();
   atm = initAtmosphere();
 })();

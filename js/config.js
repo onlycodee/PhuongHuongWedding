@@ -1,18 +1,32 @@
-// Cấu hình thiệp cưới — sửa file này, không cần đụng vào index.html hay wedding.js.
+// Site settings — everything the couple needs to edit lives here,
+// so index.html and wedding.js never have to be touched.
 window.WEDDING_CONFIG = {
-  // Phong cách mặc định: 'hien-dai' | 'sage' | 'navy' | 'rose' | 'truyen-thong'
+  // Default theme: 'hien-dai' | 'sage' | 'navy' | 'rose' | 'truyen-thong'
   theme: 'hien-dai',
-  // Hiện dải "Phong cách thiệp" để khách tự đổi màu. Đặt false khi đã chốt một phong cách.
+  // Shows the theme strip so guests can switch palettes. Set to false once a theme is final.
   showThemePicker: true,
 
   showCountdown: true,
   showGift: true,
   showGuestbook: true,
 
-  // Giờ Lễ thành hôn, dùng cho đồng hồ đếm ngược
+  // Wedding ceremony time, used by the countdown
   weddingTime: '2026-10-18T11:00:00+07:00',
 
-  // Ảnh cho từng ô. Bỏ ảnh vào assets/photos/ rồi điền đường dẫn; để '' thì hiện khung chờ.
+  // Google Apps Script web app URL (ends with /exec) that stores RSVPs and wishes
+  // in a Google Sheet — see backend/README.md. While this is empty the site runs in
+  // demo mode: submissions are kept in the visitor's own browser only.
+  apiEndpoint: 'https://script.google.com/macros/s/AKfycby3W27cmYuANQmiufo7MlWzFqLrNQ13_rUyVqD54fZZvp6Uyggb8Nx-kPDI5et0rY0U/exec',
+
+  // One-tap wishes offered above every wish box: the chip shows `label`, the box gets `text`
+  wishPresets: [
+    { label: 'Trăm năm hạnh phúc', text: 'Chúc hai bạn trăm năm hạnh phúc, đầu bạc răng long!' },
+    { label: 'Yêu thương trọn đời', text: 'Chúc mừng hạnh phúc! Mong hai bạn luôn yêu thương, nhường nhịn và nắm tay nhau đi hết cuộc đời.' },
+    { label: 'Sớm có tin vui', text: 'Chúc cô dâu chú rể sớm có tin vui, gia đình nhỏ luôn đầy ắp tiếng cười.' },
+    { label: 'Vững tay chèo', text: 'Mừng ngày chung đôi! Chúc hai bạn mãi vững tay chèo trên mọi chặng đường phía trước.' }
+  ],
+
+  // Photo for each slot. Put files in assets/photos/ and set the path; '' keeps the placeholder frame.
   photos: {
     'wed-hero': 'assets/photos/wed-hero.webp',
     'wed-groom': '',
@@ -33,7 +47,7 @@ window.WEDDING_CONFIG = {
     'wed-qr-bride': ''
   },
 
-  // Link Google Maps của hai địa điểm (nên thay bằng link ghim chính xác)
+  // Google Maps links for the two venues (replace with exact pinned links)
   maps: {
     'phu-nhieu': 'https://www.google.com/maps/search/?api=1&query=' +
       encodeURIComponent('Nhà văn hoá thôn Phú Nhiêu, Phú Xuyên, Hà Nội'),
@@ -41,13 +55,9 @@ window.WEDDING_CONFIG = {
       encodeURIComponent('Thôn Tuấn Hưng, Lai Khê, Hải Phòng')
   },
 
-  // Tài khoản mừng cưới. Để trống account thì hiện "gia đình cập nhật".
+  // Bank accounts for wedding gifts. An empty account keeps the "to be updated" text.
   gift: {
     groom: { bank: '', account: '' },
     bride: { bank: '', account: '' }
-  },
-
-  // URL nhận phản hồi RSVP (Google Apps Script, Formspree…). Nhận POST dạng form:
-  // name, side, events, note, attending. Để '' thì phản hồi chỉ lưu trên máy của khách.
-  rsvpEndpoint: ''
+  }
 };

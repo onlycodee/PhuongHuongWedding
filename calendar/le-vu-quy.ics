@@ -1,0 +1,22 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PhuongHuongWedding//Invitation//VI
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:le-vu-quy@phuonghuongwedding
+DTSTAMP:20260921T000000Z
+DTSTART:20261018T000000Z
+DTEND:20261018T020000Z
+SUMMARY:Lễ vu quy — Việt Phương & Ninh Hương
+LOCATION:Tư gia nhà gái\, thôn Tuấn Hưng\, xã Lai Khê\, TP Hải
+  Phòng
+DESCRIPTION:Trân trọng kính mời bạn đến chung vui cùng hai gi
+ a đình.
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Lễ vu quy — Việt Phương & Ninh Hương
+TRIGGER:-P1D
+END:VALARM
+END:VEVENT
+END:VCALENDAR

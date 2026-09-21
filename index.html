@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="css/wedding.css">
 <script src="js/config.js"></script>
 <script>
-// Gắn theme trước khi vẽ để không bị nháy màu: ?theme= → lựa chọn đã lưu → mặc định trong config
+// Apply the theme before first paint to avoid a colour flash: ?theme= → saved choice → config default
 (function () {
   var cfg = window.WEDDING_CONFIG || {}, theme = cfg.theme;
   try {
@@ -43,10 +43,10 @@
     <a href="#album">Album</a>
     <a href="#chi-duong">Chỉ đường</a>
   </div>
-  <a href="#xac-nhan" class="btn btn-primary wed-nav-cta">Xác nhận tham dự</a>
-  <details class="wed-menu">
+  <a href="#xac-nhan" class="btn btn-primary wed-nav-cta wed-cta">Xác nhận tham dự</a>
+  <details class="wed-pop wed-menu">
     <summary class="btn btn-secondary">Mục lục</summary>
-    <div class="wed-menu-list">
+    <div class="wed-pop-list">
       <a href="#hai-ho">Hai họ</a>
       <a href="#chuyen-tinh">Chuyện chúng mình</a>
       <a href="#su-kien">Sự kiện</a>
@@ -73,12 +73,12 @@
     <div class="wed-hero-date"><i></i><span>18 · 10 · 2026</span></div>
     <p class="wed-lead">Chúng tôi trân trọng kính mời quý vị đến chung vui trong ngày hạnh phúc của hai gia đình — tại Phú Nhiêu, Phú Xuyên, Hà Nội và Tuấn Hưng, Lai Khê, Hải Phòng.</p>
     <div class="wed-hero-actions">
-      <a href="#xac-nhan" class="btn btn-primary">Xác nhận tham dự</a>
+      <a href="#xac-nhan" class="btn btn-primary wed-cta">Xác nhận tham dự</a>
       <a href="#su-kien" class="btn btn-secondary">Xem lịch trình</a>
     </div>
   </div>
-  <figure class="plate wed-hero-photo">
-    <div class="wed-slot" data-slot="wed-hero" data-alt="Ảnh cưới Việt Phương và Ninh Hương" data-eager style="aspect-ratio:1093/1400"><span class="wed-slot-cap">Ảnh cưới dọc</span></div>
+  <figure class="plate wed-hero-plate wed-hero-photo">
+    <div class="wed-slot" data-slot="wed-hero" data-alt="Ảnh cưới Việt Phương và Ninh Hương" data-eager style="aspect-ratio:4/5"><span class="wed-slot-cap">Ảnh cưới dọc</span></div>
   </figure>
 </header>
 
@@ -216,7 +216,16 @@
           <h3 class="wed-tl-title">Tiệc mừng nhà trai</h3>
           <p class="wed-tl-place">Nhà văn hoá thôn Phú Nhiêu, xã Phú Xuyên, Hà Nội</p>
         </div>
-        <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+        <div class="wed-tl-actions">
+          <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+          <details class="wed-pop wed-cal">
+            <summary class="btn btn-ghost">Thêm vào lịch</summary>
+            <div class="wed-pop-list">
+              <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Tiệc+mừng+nhà+trai+—+Việt+Phương+%26+Ninh+Hương&amp;dates=20261017T093000Z/20261017T120000Z&amp;location=Nhà+văn+hoá+thôn+Phú+Nhiêu,+xã+Phú+Xuyên,+Hà+Nội" target="_blank" rel="noopener">Google Calendar</a>
+              <a href="calendar/tiec-nha-trai.ics">Apple · Outlook (.ics)</a>
+            </div>
+          </details>
+        </div>
       </article>
 
       <article class="wed-tl-row wed-reveal" data-reveal>
@@ -229,7 +238,16 @@
           <h3 class="wed-tl-title">Tiệc mừng nhà gái</h3>
           <p class="wed-tl-place">Tư gia nhà gái, thôn Tuấn Hưng, xã Lai Khê, TP Hải Phòng</p>
         </div>
-        <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+        <div class="wed-tl-actions">
+          <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+          <details class="wed-pop wed-cal">
+            <summary class="btn btn-ghost">Thêm vào lịch</summary>
+            <div class="wed-pop-list">
+              <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Tiệc+mừng+nhà+gái+—+Việt+Phương+%26+Ninh+Hương&amp;dates=20261017T100000Z/20261017T123000Z&amp;location=Tư+gia+nhà+gái,+thôn+Tuấn+Hưng,+xã+Lai+Khê,+TP+Hải+Phòng" target="_blank" rel="noopener">Google Calendar</a>
+              <a href="calendar/tiec-nha-gai.ics">Apple · Outlook (.ics)</a>
+            </div>
+          </details>
+        </div>
       </article>
 
       <article class="wed-tl-row wed-reveal" data-reveal>
@@ -242,7 +260,16 @@
           <h3 class="wed-tl-title">Lễ vu quy</h3>
           <p class="wed-tl-place">Gia đình nhà gái, thôn Tuấn Hưng, xã Lai Khê, TP Hải Phòng</p>
         </div>
-        <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+        <div class="wed-tl-actions">
+          <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+          <details class="wed-pop wed-cal">
+            <summary class="btn btn-ghost">Thêm vào lịch</summary>
+            <div class="wed-pop-list">
+              <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Lễ+vu+quy+—+Việt+Phương+%26+Ninh+Hương&amp;dates=20261018T000000Z/20261018T020000Z&amp;location=Tư+gia+nhà+gái,+thôn+Tuấn+Hưng,+xã+Lai+Khê,+TP+Hải+Phòng" target="_blank" rel="noopener">Google Calendar</a>
+              <a href="calendar/le-vu-quy.ics">Apple · Outlook (.ics)</a>
+            </div>
+          </details>
+        </div>
       </article>
 
       <article class="wed-tl-row wed-reveal" data-reveal>
@@ -255,7 +282,16 @@
           <h3 class="wed-tl-title">Lễ thành hôn</h3>
           <p class="wed-tl-place">Nhà văn hoá thôn Phú Nhiêu, xã Phú Xuyên, Hà Nội</p>
         </div>
-        <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+        <div class="wed-tl-actions">
+          <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+          <details class="wed-pop wed-cal">
+            <summary class="btn btn-ghost">Thêm vào lịch</summary>
+            <div class="wed-pop-list">
+              <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Lễ+thành+hôn+—+Việt+Phương+%26+Ninh+Hương&amp;dates=20261018T040000Z/20261018T070000Z&amp;location=Nhà+văn+hoá+thôn+Phú+Nhiêu,+xã+Phú+Xuyên,+Hà+Nội" target="_blank" rel="noopener">Google Calendar</a>
+              <a href="calendar/le-thanh-hon.ics">Apple · Outlook (.ics)</a>
+            </div>
+          </details>
+        </div>
       </article>
     </div>
   </div>
@@ -287,10 +323,11 @@
     <p class="wed-lead">Vui lòng phản hồi trước ngày 10.10.2026 để hai gia đình chuẩn bị chỗ ngồi được chu đáo.</p>
   </div>
 
-  <form class="wed-form" id="rsvp-form">
+  <form class="wed-form" id="rsvp-form" novalidate>
     <div class="field">
       <label for="rsvp-name" class="wed-flabel">Họ và tên</label>
-      <input id="rsvp-name" name="name" class="input" type="text" placeholder="Nguyễn Văn A" autocomplete="name" required>
+      <input id="rsvp-name" name="name" class="input" type="text" placeholder="Nguyễn Văn A" autocomplete="name" maxlength="80" aria-describedby="rsvp-name-error">
+      <p class="wed-field-error" id="rsvp-name-error" hidden></p>
     </div>
     <div class="field">
       <span class="wed-flabel">Bạn là khách của</span>
@@ -299,19 +336,33 @@
         <label class="seg-opt"><input type="radio" name="side" value="bride">Nhà gái</label>
       </div>
     </div>
-    <div class="field">
-      <span class="wed-flabel">Bạn dự buổi nào</span>
+    <div class="field" id="rsvp-events" role="group" aria-labelledby="rsvp-events-label" aria-describedby="rsvp-events-error">
+      <span class="wed-flabel" id="rsvp-events-label">Bạn dự buổi nào</span>
       <div class="wed-events">
         <label class="radio"><input type="checkbox" name="events" value="Tiệc nhà trai 17/10"><span class="wed-box"></span>Tiệc nhà trai — 4:30 PM, 17/10/2026</label>
         <label class="radio"><input type="checkbox" name="events" value="Tiệc nhà gái 17/10"><span class="wed-box"></span>Tiệc nhà gái — 5:00 PM, 17/10/2026</label>
         <label class="radio"><input type="checkbox" name="events" value="Lễ vu quy 18/10"><span class="wed-box"></span>Lễ vu quy — 7:00 AM, 18/10/2026</label>
         <label class="radio"><input type="checkbox" name="events" value="Lễ thành hôn 18/10" checked><span class="wed-box"></span>Lễ thành hôn — 11:00 AM, 18/10/2026</label>
       </div>
+      <p class="wed-field-error" id="rsvp-events-error" hidden></p>
+    </div>
+    <div class="field">
+      <label for="rsvp-guests" class="wed-flabel">Số người tham dự</label>
+      <select id="rsvp-guests" name="guests" class="input wed-guests">
+        <option value="1" selected>1 người</option>
+        <option value="2">2 người</option>
+        <option value="3">3 người</option>
+        <option value="4">4 người</option>
+        <option value="5">5 người</option>
+        <option value="6">6 người</option>
+      </select>
     </div>
     <div class="field">
       <label for="rsvp-note" class="wed-flabel">Lời chúc</label>
-      <textarea id="rsvp-note" name="note" class="input" rows="3" placeholder="Chúc hai bạn trăm năm hạnh phúc…"></textarea>
+      <div class="wed-presets" data-presets-for="rsvp-note"></div>
+      <textarea id="rsvp-note" name="note" class="input" rows="3" maxlength="500" placeholder="Chúc hai bạn trăm năm hạnh phúc…"></textarea>
     </div>
+    <input class="wed-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="wed-form-actions">
       <button type="submit" class="btn btn-primary btn-block wed-cta">Gửi xác nhận</button>
       <button type="button" class="btn btn-ghost wed-decline" id="rsvp-decline">Tiếc quá, tôi không đi được</button>
@@ -380,28 +431,41 @@
   <div class="wed-wrap">
     <p class="wed-kicker wed-head wed-reveal" data-reveal>Sổ lưu bút</p>
     <h2 class="wed-title wed-head wed-reveal" data-reveal>Lời chúc của mọi người</h2>
-    <div class="wed-wishes">
-      <article class="card wed-reveal" data-reveal>
-        <p class="card-kicker">Bạn cấp ba</p>
-        <p class="card-title">Minh &amp; Hà</p>
-        <p class="wed-wish">Chúc Phương và Hương trăm năm hạnh phúc, sớm có tin vui!</p>
-      </article>
-      <article class="card wed-reveal" data-reveal>
-        <p class="card-kicker">Đồng nghiệp</p>
-        <p class="card-title">Phòng Kỹ thuật</p>
-        <p class="wed-wish">Cả phòng sẽ có mặt đúng 11:00 AM ngày 18/10/2026. Chúc mừng hai bạn!</p>
-      </article>
-      <article class="card wed-reveal" data-reveal>
-        <p class="card-kicker">Họ hàng Hải Phòng</p>
-        <p class="card-title">Gia đình cô Ngân</p>
-        <p class="wed-wish">Mừng cháu Hương về nhà chồng. Chúc hai con mãi thuận hoà.</p>
-      </article>
+    <div class="wed-guestbook">
+      <form class="wed-form wed-reveal" data-reveal id="wish-form" novalidate>
+        <div class="field">
+          <label for="wish-name" class="wed-flabel">Họ và tên</label>
+          <input id="wish-name" name="name" class="input" type="text" placeholder="Nguyễn Văn A" autocomplete="name" maxlength="80" aria-describedby="wish-name-error">
+          <p class="wed-field-error" id="wish-name-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="wish-relation" class="wed-flabel">Bạn là <span class="wed-optional">(không bắt buộc)</span></label>
+          <input id="wish-relation" name="relation" class="input" type="text" placeholder="Bạn đại học của Hương" maxlength="80">
+        </div>
+        <div class="field">
+          <label for="wish-message" class="wed-flabel">Lời chúc</label>
+          <div class="wed-presets" data-presets-for="wish-message"></div>
+          <textarea id="wish-message" name="message" class="input" rows="4" maxlength="500" placeholder="Viết đôi lời gửi cô dâu chú rể…" aria-describedby="wish-message-error"></textarea>
+          <p class="wed-field-error" id="wish-message-error" hidden></p>
+        </div>
+        <input class="wed-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="wed-form-actions">
+          <button type="submit" class="btn btn-primary btn-block wed-cta">Gửi lời chúc</button>
+          <p class="wed-form-note" id="wish-thanks" role="status" hidden>Cảm ơn bạn! Lời chúc đã được gửi tới cô dâu chú rể.</p>
+          <p class="wed-form-error" id="wish-error" role="alert" hidden>Chưa gửi được lời chúc. Bạn vui lòng thử lại giúp chúng mình nhé.</p>
+        </div>
+      </form>
+      <div>
+        <div class="wed-wishes" id="wish-list" aria-live="polite"></div>
+        <p class="wed-wish-status" id="wish-status">Đang tải lời chúc…</p>
+        <button type="button" class="btn btn-secondary wed-wish-more" id="wish-more" hidden>Xem thêm lời chúc</button>
+      </div>
     </div>
   </div>
 </section>
 
 <div class="wed-bar">
-  <a href="#xac-nhan" class="btn btn-primary">Xác nhận tham dự</a>
+  <a href="#xac-nhan" class="btn btn-primary wed-cta">Xác nhận tham dự</a>
   <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
 </div>
 

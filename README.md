@@ -1,33 +1,55 @@
 # PhuongHuongWedding
 
-Thiệp cưới online của **Việt Phương & Ninh Hương** — Lễ thành hôn 18 · 10 · 2026.
+Online wedding invitation for **Việt Phương & Ninh Hương** — wedding ceremony on 18 · 10 · 2026.
 
-Trang tĩnh thuần HTML/CSS/JS, không cần build. Thiết kế gốc: project *Thiep Cuoi* trên claude.ai/design (design system Classical).
+A static HTML/CSS/JS site with no build step. RSVPs and guestbook wishes are stored in a
+Google Sheet through a small Google Apps Script. The visual design comes from the
+*Thiep Cuoi* project on claude.ai/design (Classical design system).
 
-## Chạy thử
+## Stack
+
+| Need | Choice | Cost |
+| --- | --- | --- |
+| Hosting | GitHub Pages (serves this repo as-is) | Free |
+| Storing RSVPs and wishes | Google Sheet + Apps Script web app — see [`backend/`](backend/README.md) | Free |
+| Add to calendar | Google Calendar links + static `.ics` files in `calendar/` | Free |
+
+## Run locally
 
 ```bash
-npm start        # mở http://localhost:3000
+npm start        # http://localhost:3000
 ```
 
-Hoặc mở thẳng `index.html` bằng trình duyệt.
+Or open `index.html` directly in a browser. While `apiEndpoint` is empty the site runs in
+**demo mode**: RSVPs and wishes are kept in your own browser, so every flow can be tried
+without a backend.
 
-## Cấu trúc
+## Layout
 
-| File | Vai trò |
+| Path | Role |
 | --- | --- |
-| `index.html` | Nội dung thiệp |
-| `js/config.js` | **Mọi thứ cần chỉnh**: theme, ảnh, link bản đồ, số tài khoản, nơi nhận RSVP |
-| `js/wedding.js` | Đổi theme, đếm ngược, hiệu ứng cuộn, form RSVP, nền cánh hoa |
-| `css/classical.css` | Design system Classical (giữ nguyên từ bản thiết kế) |
-| `css/wedding.css` | Năm bộ màu và layout của trang |
-| `assets/photos/` | Ảnh cưới, mã QR, ảnh bản đồ |
+| `index.html` | Invitation content (Vietnamese copy) |
+| `js/config.js` | **Everything you normally edit**: theme, backend URL, wish presets, photos, map links, bank accounts |
+| `js/wedding.js` | Theme switcher, countdown, scroll reveal, RSVP + guestbook forms, petal backdrop |
+| `css/classical.css` | Classical design system, kept verbatim from the design project |
+| `css/wedding.css` | The five palettes and the page layout |
+| `calendar/*.ics` | One calendar file per event (must keep CRLF line endings — see `.gitattributes`) |
+| `backend/Code.gs` | Apps Script that writes to the Google Sheet and serves the wish list |
+| `assets/photos/` | Wedding photos, QR codes, map screenshots |
 
-## Việc cần làm trước khi gửi thiệp
+## Before sending the invitation
 
-1. **Ảnh** — bỏ ảnh vào `assets/photos/` rồi điền đường dẫn vào `photos` trong `js/config.js`. Ô nào chưa có ảnh sẽ hiện khung chờ.
-2. **Bản đồ** — thay `maps` bằng link ghim Google Maps chính xác của hai địa điểm.
-3. **Mừng cưới** — điền `gift.groom` / `gift.bride` (ngân hàng, số tài khoản) và ảnh QR.
-4. **RSVP** — điền `rsvpEndpoint` (Google Apps Script, Formspree…) để nhận phản hồi. Để trống thì phản hồi chỉ lưu trên máy của khách.
-5. **Phong cách** — chọn `theme`, rồi đặt `showThemePicker: false` nếu không muốn khách tự đổi màu. Có thể xem nhanh bằng `?theme=navy`.
-6. **Sổ lưu bút** — ba lời chúc trong `index.html` là mẫu; thay bằng lời chúc thật hoặc đặt `showGuestbook: false`.
+1. **Backend** — follow [`backend/README.md`](backend/README.md) and paste the web app URL into `apiEndpoint`.
+2. **Photos** — put files in `assets/photos/` and set their paths under `photos` in `js/config.js`.
+   Slots without a photo show a placeholder frame.
+3. **Maps** — replace `maps` with the exact pinned Google Maps links of both venues.
+4. **Gift box** — fill in `gift.groom` / `gift.bride` (bank, account number) and add the QR images.
+5. **Theme** — pick `theme`, then set `showThemePicker: false` if guests should not switch palettes.
+   Preview any palette with `?theme=navy`.
+6. **Event times** — if a time or venue changes, update it in `index.html` (schedule, RSVP options,
+   Google Calendar links) and in the matching `calendar/*.ics` file.
+
+## Deploy to GitHub Pages
+
+Repo **Settings → Pages → Deploy from a branch → `master` / `(root)`**. The site is then served at
+`https://onlycodee.github.io/PhuongHuongWedding/`. GitHub Pages on a free plan needs a public repo.

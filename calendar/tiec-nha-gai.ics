@@ -1,0 +1,22 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PhuongHuongWedding//Invitation//VI
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:tiec-nha-gai@phuonghuongwedding
+DTSTAMP:20260921T000000Z
+DTSTART:20261017T100000Z
+DTEND:20261017T123000Z
+SUMMARY:Tiệc mừng nhà gái — Việt Phương & Ninh Hương
+LOCATION:Tư gia nhà gái\, thôn Tuấn Hưng\, xã Lai Khê\, TP Hải
+  Phòng
+DESCRIPTION:Trân trọng kính mời bạn đến chung vui cùng hai gi
+ a đình.
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tiệc mừng nhà gái — Việt Phương & Ninh Hương
+TRIGGER:-P1D
+END:VALARM
+END:VEVENT
+END:VCALENDAR

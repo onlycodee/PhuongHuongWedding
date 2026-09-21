@@ -1,6 +1,9 @@
 /* PhuongHuongWedding — hidden mini game. PROTOTYPE: four candidate mechanics, pick one.
  *
- * The game is invisible until a guest pops a falling petal or heart (wedding.js fires "phw:pop").
+ * The game is never announced. Guests find it in one of two ways:
+ *   - a golden heart drifts across the page now and then; tapping it starts a round
+ *   - popping falling petals (wedding.js fires "phw:pop") counts "✦ 1", "✦ 2"; the third pop starts a round
+ * Each visit draws one of the mechanics at random.
  * Then a score bar and a countdown slide in. A round that ends below its goal resets the score
  * to 0; a round that reaches the goal can be saved to the leaderboard. The leaderboard section
  * at the end of the page only appears for guests who have played.
@@ -10,7 +13,7 @@
 (function () {
   'use strict';
 
-  const cfg = Object.assign({ enabled: true, mode: 'rush', lab: false }, (window.WEDDING_CONFIG || {}).game);
+  const cfg = Object.assign({ enabled: true, mode: 'random', lab: false }, (window.WEDDING_CONFIG || {}).game);
   if (!cfg.enabled || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const root = document.documentElement;
@@ -332,8 +335,17 @@
   boardWrap.append(el('p', 'wed-kicker wed-head', 'Trò chơi bí mật'), el('h2', 'wed-title wed-head', 'Bảng vàng'), boardLead, boardList);
   board.append(boardWrap);
 
-  let mode = new URLSearchParams(location.search).get('game') || store.get('phw-game-mode') || cfg.mode;
-  if (!MODES[mode]) mode = 'rush';
+  // Every visit draws a mechanic at random, never the same one twice in a row
+  const pickRandom = () => {
+    const pool = MODE_KEYS.filter((k) => k !== store.get('phw-game-last'));
+    const key = pool[Math.floor(Math.random() * pool.length)];
+    store.set('phw-game-last', key);
+    return key;
+  };
+  // ?game=<mode> wins, then the lab's choice (prototype only), then the config
+  let choice = new URLSearchParams(location.search).get('game') || (cfg.lab && store.get('phw-game-lab')) || cfg.mode;
+  if (!MODES[choice]) choice = 'random';
+  let mode = choice === 'random' ? pickRandom() : choice;
 
   const scores = () => { try { return JSON.parse(store.get('phw-game-scores')) || {}; } catch (e) { return {}; } };
   const savedName = () => {
@@ -346,7 +358,8 @@
   const renderBoard = () => {
     board.hidden = !store.get('phw-game-played');
     const def = MODES[mode];
-    boardLead.textContent = 'Bạn đã tìm ra trò chơi ẩn “' + def.name + '”. Đạt từ ' + def.goal + ' điểm để ghi tên lên bảng.';
+    boardLead.textContent = 'Bạn đã tìm ra trò chơi ẩn “' + def.name + '”. Đạt từ ' + def.goal +
+      ' điểm để ghi tên lên bảng. Muốn chơi lại? Hãy chạm vào ba cánh hoa đang rơi.';
     const rows = (scores()[mode] || []).concat(sampleRows(def.goal)).sort((a, b) => b.score - a.score).slice(0, 8);
     boardList.textContent = '';
     rows.forEach((r, i) => {
@@ -358,7 +371,7 @@
   };
 
   /* ===== Round ===== */
-  let g = null, raf = 0, swallowClickAt = 0, hintTimer = 0, lab = null;
+  let g = null, raf = 0, swallowClickAt = 0, hintTimer = 0, lab = null, pops = 0;
 
   const resize = () => {
     const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -412,10 +425,13 @@
     clearTimeout(hintTimer);
     hintTimer = setTimeout(() => hud.classList.add('is-compact'), 5000);
     if (lab) lab.open = false;
+    pops = 0;
+    removeLure();
     root.classList.add('wed-game-on');
     document.body.append(canvas);
     resize();
     def.start(g, origin || { x: innerWidth / 2, y: innerHeight * 0.4 });
+    if (origin) g.burst(origin.x, origin.y, colors.accent, 16);
     showHud();
     let last = performance.now();
     cancelAnimationFrame(raf);
@@ -526,23 +542,107 @@
   }, true);
   addEventListener('resize', resize, { passive: true });
   hudQuit.addEventListener('click', () => finish(true));
-  document.addEventListener('phw:pop', (e) => { if (card.hidden) start(e.detail); });
+
+  /* ===== Discovery: nothing ever says "play a game" ===== */
+  const POPS_TO_START = 3;
+  const floatText = (x, y, str) => {
+    const n = el('span', 'wed-game-float', str);
+    n.style.left = x + 'px'; n.style.top = y + 'px';
+    n.addEventListener('animationend', () => n.remove());
+    document.body.append(n);
+  };
+  // Popped petals quietly count up; the third one turns out to be a game
+  document.addEventListener('phw:pop', (e) => {
+    if ((g && g.playing) || !card.hidden) return;
+    if (++pops >= POPS_TO_START) start(e.detail);
+    else floatText(e.detail.x, e.detail.y, '✦ ' + pops);
+  });
+
+  // The lure: a glowing golden heart that drifts across the page. It is a real element, so it
+  // needs no hit-testing, and it follows the theme colours through CSS.
+  const HEART = 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z';
+  const MAX_LURES = 6;
+  let lure = null, lureTimer = 0, luresShown = 0, whispered = false;
+  function removeLure() { if (lure) { lure.remove(); lure = null; } }
+  const scheduleLure = (min, max) => {
+    clearTimeout(lureTimer);
+    lureTimer = setTimeout(() => releaseLure(), rand(min, max) * 1000);
+  };
+  const whisper = () => {
+    if (whispered || store.get('phw-game-played')) return;
+    whispered = true;
+    const n = el('p', 'wed-game-whisper', 'Psst… trái tim vàng kia hình như đang chờ ai đó chạm vào ✦');
+    n.addEventListener('animationend', () => n.remove());
+    document.body.append(n);
+  };
+  // from: { x, y } makes the heart rise out of a spot on the page (a thank-you message);
+  // otherwise it drifts down from the top
+  function releaseLure(from) {
+    if ((g && g.playing) || !card.hidden || document.hidden) { if (!from) scheduleLure(8, 14); return; }
+    if (!from && ++luresShown > MAX_LURES) return;
+    removeLure();
+    const x0 = from ? from.x : rand(0.12, 0.88) * innerWidth;
+    const node = lure = el('div', 'wed-game-lure');
+    node.setAttribute('aria-hidden', 'true');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', HEART);
+    svg.append(path);
+    const sway = el('i');
+    sway.append(svg);
+    node.append(sway);
+    node.style.setProperty('--x0', x0 + 'px');
+    node.style.setProperty('--y0', (from ? from.y : -40) + 'px');
+    node.style.setProperty('--x1', clamp(x0 + rand(-0.2, 0.2) * innerWidth, 40, innerWidth - 40) + 'px');
+    node.style.setProperty('--y1', (from ? -60 : innerHeight + 40) + 'px');
+    node.style.setProperty('--dur', (from ? 9 : rand(15, 19)) + 's');
+    node.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      swallowClickAt = performance.now();
+      const r = node.getBoundingClientRect();
+      start({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+    });
+    node.addEventListener('animationend', (e) => {
+      if (e.target !== node) return;
+      if (lure === node) lure = null;
+      node.remove();
+      scheduleLure(18, 30);
+    });
+    document.body.append(node);
+    // The first heart passes in silence; from the second one on, a single whisper may point at it
+    if (!from && luresShown >= 2) whisper();
+  }
+  // A heart also rises out of the thank-you message after an RSVP or a wish: a small reward at a happy moment
+  ['#rsvp-sent', '#wish-thanks'].forEach((sel) => {
+    const node = document.querySelector(sel);
+    if (!node) return;
+    new MutationObserver(() => {
+      if (node.hidden) return;
+      setTimeout(() => {
+        const r = node.getBoundingClientRect();
+        releaseLure({ x: clamp(r.left + r.width / 2, 40, innerWidth - 40), y: clamp(r.top, 80, innerHeight - 80) });
+      }, 900);
+    }).observe(node, { attributes: true, attributeFilter: ['hidden'] });
+  });
+  scheduleLure(7, 12);
 
   /* ===== Lab switcher (prototype only): pick a mechanic without hunting for a petal ===== */
   function initLab() {
     lab = el('details', 'wed-game-lab');
-    lab.open = innerWidth > 640;
     lab.append(el('summary', '', 'Game lab'));
     const chips = el('div', 'wed-game-lab-chips');
-    const setMode = (key) => {
+    const setMode = (key, keepDraw) => {
       if (g && g.playing) finish(true);
       card.hidden = true; hud.hidden = true;
-      mode = key; store.set('phw-game-mode', key);
+      choice = key; store.set('phw-game-lab', key);
+      if (!keepDraw) mode = key === 'random' ? pickRandom() : key;
       chips.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === key)));
+      chips.firstChild.textContent = 'Ngẫu nhiên' + (key === 'random' ? ' → ' + MODES[mode].name : '');
       renderBoard();
     };
-    MODE_KEYS.forEach((key, i) => {
-      const b = el('button', 'wed-theme-chip', (i + 1) + ' · ' + MODES[key].name);
+    ['random'].concat(MODE_KEYS).forEach((key, i) => {
+      const b = el('button', 'wed-theme-chip', key === 'random' ? 'Ngẫu nhiên' : i + ' · ' + MODES[key].name);
       b.type = 'button'; b.dataset.mode = key;
       b.addEventListener('click', () => setMode(key));
       chips.append(b);
@@ -556,9 +656,12 @@
       try { ['phw-game-scores', 'phw-game-played', 'phw-game-name'].forEach((k) => localStorage.removeItem(k)); } catch (e) {}
       renderBoard();
     });
-    lab.append(chips, play, wipe);
+    const drop = el('button', 'wed-theme-chip', 'Thả tim vàng ngay');
+    drop.type = 'button';
+    drop.addEventListener('click', () => { lab.open = false; luresShown = 0; releaseLure(); });
+    lab.append(chips, play, drop, wipe);
     document.body.append(lab);
-    setMode(mode);
+    setMode(choice, true);
   }
 
   const footer = document.querySelector('.wed-footer');

@@ -41,6 +41,19 @@
 .wed-game-who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wed-game-pts{font-variant-numeric:tabular-nums;font-weight:500}
 
+/* The lure: a glowing golden heart drifting across the page. Tapping it starts a round. */
+.wed-game-lure{position:fixed;left:0;top:0;z-index:55;width:48px;height:48px;margin:-24px 0 0 -24px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;animation:wed-lure-path var(--dur,16s) linear forwards}
+.wed-game-lure::before{content:'';position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--wed-accent) 42%,transparent),transparent 66%);animation:wed-lure-pulse 1.7s ease-in-out infinite}
+.wed-game-lure i{position:relative;display:block;width:100%;height:100%;animation:wed-lure-sway 3.4s ease-in-out infinite alternate}
+.wed-game-lure svg{display:block;width:26px;height:26px;margin:11px;fill:var(--wed-accent);filter:drop-shadow(0 0 1px var(--wed-background)) drop-shadow(0 0 7px color-mix(in srgb,var(--wed-accent) 80%,transparent));animation:wed-lure-pulse 1.7s ease-in-out infinite}
+.wed-game-lure i::before,.wed-game-lure i::after{content:'✦';position:absolute;font-size:9px;line-height:1;color:var(--wed-accent);animation:wed-lure-twinkle 1.9s ease-in-out infinite}
+.wed-game-lure i::before{left:2px;top:6px}
+.wed-game-lure i::after{right:1px;bottom:8px;font-size:7px;animation-delay:.9s}
+/* Petals popped before the game is found count up quietly */
+.wed-game-float{position:fixed;z-index:55;margin:-26px 0 0 -14px;pointer-events:none;font-family:var(--font-heading);font-size:18px;color:var(--wed-accent-deep,var(--wed-accent));text-shadow:0 0 6px var(--wed-background),0 0 2px var(--wed-background);animation:wed-game-float 1.1s ease-out forwards}
+.wed-game-whisper{position:fixed;left:50%;bottom:24px;z-index:45;width:max-content;max-width:calc(100vw - 32px);margin:0;padding:8px 16px;transform:translateX(-50%);pointer-events:none;font-family:var(--font-heading);font-style:italic;font-size:14.5px;text-align:center;color:var(--color-text);background:color-mix(in srgb,var(--color-bg) 88%,transparent);backdrop-filter:blur(6px);border-radius:100px;animation:wed-game-whisper 7s ease forwards}
+@media (max-width:860px){.wed-game-whisper{bottom:calc(92px + env(safe-area-inset-bottom))}}
+
 /* Lab switcher (prototype only) */
 .wed-game-lab{position:fixed;left:12px;bottom:12px;z-index:50;max-width:min(300px,calc(100vw - 24px));padding:8px 12px;font-size:12.5px;background:color-mix(in srgb,var(--color-bg) 95%,transparent);backdrop-filter:blur(8px);border:1px dashed var(--color-accent);border-radius:var(--radius-md);box-shadow:var(--shadow-md)}
 .wed-game-lab summary{cursor:pointer;font-weight:500;letter-spacing:.06em;text-transform:uppercase;font-size:11.5px}
@@ -49,6 +62,12 @@
 .wed-game-lab .btn{width:100%;min-height:42px;margin-bottom:6px}
 @media (max-width:860px){.wed-game-lab{bottom:calc(84px + env(safe-area-inset-bottom))}}
 
+@keyframes wed-lure-path{0%{opacity:0;transform:translate(var(--x0),var(--y0))}8%,90%{opacity:1}100%{opacity:0;transform:translate(var(--x1),var(--y1))}}
+@keyframes wed-lure-sway{from{transform:translateX(-24px) rotate(-12deg)}to{transform:translateX(24px) rotate(12deg)}}
+@keyframes wed-lure-pulse{50%{transform:scale(1.2)}}
+@keyframes wed-lure-twinkle{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:1;transform:scale(1.1)}}
+@keyframes wed-game-float{from{opacity:0;transform:translateY(6px) scale(.8)}25%{opacity:1;transform:translateY(-8px) scale(1.1)}to{opacity:0;transform:translateY(-44px) scale(1)}}
+@keyframes wed-game-whisper{0%{opacity:0;transform:translate(-50%,8px)}10%,82%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,0)}}
 @keyframes wed-game-in{from{opacity:0;transform:translate(-50%,-16px)}to{opacity:1;transform:translate(-50%,0)}}
 @keyframes wed-game-card{from{opacity:0;transform:translate(-50%,-46%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 @keyframes wed-game-bump{40%{transform:scale(1.25)}}

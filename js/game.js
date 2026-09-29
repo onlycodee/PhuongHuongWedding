@@ -400,7 +400,7 @@
     store.set('phw-game-seen', '1');
     removeLure();
     clearTimeout(lureTimer);
-    if (lab) lab.open = false;
+    if (lab) { lab.hidden = false; lab.open = false; }
     card.textContent = '';
     const go = el('button', 'btn btn-primary wed-cta', 'Bắt đầu');
     go.type = 'button';
@@ -665,9 +665,12 @@
   });
   if (!seen()) scheduleLure(7, 12);
 
-  /* ===== Lab switcher (prototype only): pick a mechanic without hunting for a petal ===== */
+  /* ===== Lab switcher (prototype only): pick a mechanic without hunting for a petal =====
+     The button only shows once the guest has unlocked the hidden game; before that the page
+     gives nothing away. */
   function initLab() {
     lab = el('details', 'wed-game-lab');
+    lab.hidden = !seen();
     lab.append(el('summary', '', 'Game lab'));
     const chips = el('div', 'wed-game-lab-chips');
     const setMode = (key, keepDraw) => {
@@ -692,6 +695,10 @@
     wipe.type = 'button';
     wipe.addEventListener('click', () => {
       try { ['phw-game-scores', 'phw-game-played', 'phw-game-name', 'phw-game-seen'].forEach((k) => localStorage.removeItem(k)); } catch (e) {}
+      // Back to a first visit: the lab disappears until the game is found again
+      lab.hidden = true; lab.open = false;
+      pops = hearts = 0; luresShown = 0;
+      scheduleLure(7, 12);
       renderBoard();
     });
     const drop = el('button', 'wed-theme-chip', 'Thả tim vàng ngay');

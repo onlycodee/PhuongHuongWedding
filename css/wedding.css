@@ -109,7 +109,23 @@ section[id]{scroll-margin-top:72px}
 .input::placeholder{opacity:.5}
 .card,.plate{background:transparent}
 /* The design system tints framed photos sepia; wedding photos keep their own colours */
-.plate{filter:none}
+/* ===== Photo finish =====
+   True colours (classical.css tints plates sepia) with a tiny lift against WebP flatness.
+   Depth comes from the frame, a soft vignette and a hover response, not from tinting the pixels. */
+.plate{filter:none;box-shadow:var(--shadow-md),0 18px 40px -22px color-mix(in srgb,var(--wed-primary-deep) 45%,transparent);transition:transform .35s ease,box-shadow .35s ease}
+.wed-slot img{filter:contrast(1.04) saturate(1.06);transition:transform .5s ease,filter .35s ease}
+.wed-slot.is-filled::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 clamp(24px,5vw,64px) color-mix(in srgb,var(--wed-primary-deep) 16%,transparent)}
+.wed-slot--qr img{filter:none}
+.wed-slot--qr::after{display:none}
+@media (hover:hover){
+  .plate:has(.is-zoomable):hover{transform:translateY(-3px);box-shadow:var(--shadow-lg),0 30px 54px -24px color-mix(in srgb,var(--wed-primary-deep) 55%,transparent)}
+  .plate:has(.is-zoomable):hover .wed-slot img{transform:scale(1.035);filter:contrast(1.04) saturate(1.06) brightness(1.03)}
+}
+@media (prefers-reduced-motion:reduce){
+  .plate,.wed-slot img{transition:none}
+  .plate:has(.is-zoomable):hover{transform:none}
+  .plate:has(.is-zoomable):hover .wed-slot img{transform:none}
+}
 .btn-secondary,.btn-ghost{color:var(--color-text)}
 .btn-primary{transition:box-shadow .45s ease,background-color .3s ease,color .3s ease}
 .btn-primary:hover{box-shadow:0 0 0 4px color-mix(in srgb,var(--wed-accent) 24%,transparent)}

@@ -71,7 +71,8 @@
     const cs = getComputedStyle(root);
     const v = (name) => cs.getPropertyValue(name).trim() || '#888';
     colors = { bg: v('--wed-background'), primary: v('--wed-primary'), accent: v('--wed-accent'),
-               secondary: v('--wed-secondary'), deep: v('--wed-primary-deep') };
+               secondary: v('--wed-secondary'), deep: v('--wed-primary-deep'),
+               gold: v('--wed-gold') }; // the golden heart keeps its colour in every theme
     for (const s of SHAPES) colors[s] = v(SHAPE_VAR[s]);
   };
   // Game pieces float above the page text, so each gets a light halo to stay readable
@@ -188,7 +189,7 @@
         const h = g.heart;
         if (Math.hypot(h.x - x, h.y - y) - h.r > slop) return false;
         g.add(1);
-        g.burst(h.x, h.y, colors.accent, 14);
+        g.burst(h.x, h.y, colors.gold, 14);
         g.text(h.x, h.y, '+1');
         g.timeMax = Math.max(1.1, this.time * Math.pow(0.94, g.score));
         g.timeLeft = g.timeMax;
@@ -201,10 +202,10 @@
         const c = g.ctx;
         c.save();
         c.globalAlpha = 0.25 * left;
-        c.fillStyle = colors.accent;
+        c.fillStyle = colors.gold;
         c.beginPath(); c.arc(h.x, h.y, h.r * 1.9 * pulse, 0, Math.PI * 2); c.fill();
         c.restore();
-        drawShape(c, 'heart', h.x, h.y, h.r * 0.8 * h.grow * pulse, 0, colors.accent, 0.45 + 0.55 * left);
+        drawShape(c, 'heart', h.x, h.y, h.r * 0.8 * h.grow * pulse, 0, colors.gold, 0.45 + 0.55 * left);
       }
     },
 

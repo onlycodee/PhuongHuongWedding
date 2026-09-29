@@ -1,8 +1,8 @@
 /* PhuongHuongWedding — hidden mini game. PROTOTYPE: four candidate mechanics, pick one.
  *
  * The game is never announced. Guests find it in one of two ways:
- *   - a golden heart drifts across the page now and then; tapping it starts a round
- *   - popping falling petals (wedding.js fires "phw:pop") counts "✦ 1", "✦ 2"; the third pop starts a round
+ *   - a golden heart drifts across the page now and then; the second one tapped starts a round
+ *   - popping falling petals (wedding.js fires "phw:pop") counts "✦ 1" … "✦ 3"; the fourth pop starts a round
  * Each visit draws one of the mechanics at random.
  * A card in the middle of the screen explains the rules; the round only begins when the guest
  * presses "Bắt đầu". Then a score bar and a countdown slide in. A round that ends below its goal resets the score
@@ -360,7 +360,7 @@
     board.hidden = !store.get('phw-game-played');
     const def = MODES[mode];
     boardLead.textContent = 'Bạn đã tìm ra trò chơi ẩn “' + def.name + '”. Đạt từ ' + def.goal +
-      ' điểm để ghi tên lên bảng. Muốn chơi lại? Hãy chạm vào ba cánh hoa đang rơi.';
+      ' điểm để ghi tên lên bảng. Muốn chơi lại? Hãy chạm vào bốn cánh hoa đang rơi, hoặc hai trái tim vàng.';
     const rows = (scores()[mode] || []).concat(sampleRows(def.goal)).sort((a, b) => b.score - a.score).slice(0, 8);
     boardList.textContent = '';
     rows.forEach((r, i) => {
@@ -372,7 +372,7 @@
   };
 
   /* ===== Round ===== */
-  let g = null, raf = 0, swallowClickAt = 0, hintTimer = 0, lab = null, pops = 0;
+  let g = null, raf = 0, swallowClickAt = 0, hintTimer = 0, lab = null, pops = 0, hearts = 0;
 
   const resize = () => {
     const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -393,7 +393,7 @@
   function start(origin) {
     if ((g && g.playing) || !card.hidden) return;
     const def = MODES[mode];
-    pops = 0;
+    pops = hearts = 0;
     removeLure();
     if (lab) lab.open = false;
     card.textContent = '';
@@ -450,7 +450,7 @@
     clearTimeout(hintTimer);
     hintTimer = setTimeout(() => hud.classList.add('is-compact'), 5000);
     if (lab) lab.open = false;
-    pops = 0;
+    pops = hearts = 0;
     removeLure();
     root.classList.add('wed-game-on');
     document.body.append(canvas);
@@ -569,14 +569,15 @@
   hudQuit.addEventListener('click', () => finish(true));
 
   /* ===== Discovery: nothing ever says "play a game" ===== */
-  const POPS_TO_START = 3;
+  const POPS_TO_START = 4;     // falling petals, flowers, stars and small hearts
+  const HEARTS_TO_START = 2;   // the big golden hearts
   const floatText = (x, y, str) => {
     const n = el('span', 'wed-game-float', str);
     n.style.left = x + 'px'; n.style.top = y + 'px';
     n.addEventListener('animationend', () => n.remove());
     document.body.append(n);
   };
-  // Popped petals quietly count up; the third one turns out to be a game
+  // Popped petals quietly count up; the fourth one turns out to be a game
   document.addEventListener('phw:pop', (e) => {
     if ((g && g.playing) || !card.hidden) return;
     if (++pops >= POPS_TO_START) start(e.detail);
@@ -626,7 +627,13 @@
       e.preventDefault();
       swallowClickAt = performance.now();
       const r = node.getBoundingClientRect();
-      start({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+      const at = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      if (++hearts >= HEARTS_TO_START) { start(at); return; }
+      // The first heart just pops, and the next one follows soon after
+      if (lure === node) lure = null;
+      node.remove();
+      floatText(at.x, at.y, '♥ ' + hearts);
+      scheduleLure(5, 9);
     });
     node.addEventListener('animationend', (e) => {
       if (e.target !== node) return;

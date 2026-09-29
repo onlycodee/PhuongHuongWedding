@@ -10,7 +10,7 @@ window.WEDDING_CONFIG = {
   showGift: true,
   showGuestbook: true,
 
-  // Hidden mini game (js/game.js), found by tapping the drifting golden heart or popping three petals.
+  // Hidden mini game (js/game.js), found by popping four falling petals or tapping two drifting golden hearts.
   // mode: 'random' (a different one each visit) | 'rush' | 'chase' | 'match' | 'keepup'.
   // lab: true shows the prototype switcher.
   game: { enabled: true, mode: 'random', lab: true },

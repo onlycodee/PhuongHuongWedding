@@ -108,6 +108,8 @@ section[id]{scroll-margin-top:72px}
 .input{background:transparent;border-color:var(--color-divider)}
 .input::placeholder{opacity:.5}
 .card,.plate{background:transparent}
+/* The design system tints framed photos sepia; wedding photos keep their own colours */
+.plate{filter:none}
 .btn-secondary,.btn-ghost{color:var(--color-text)}
 .btn-primary{transition:box-shadow .45s ease,background-color .3s ease,color .3s ease}
 .btn-primary:hover{box-shadow:0 0 0 4px color-mix(in srgb,var(--wed-accent) 24%,transparent)}
@@ -306,13 +308,13 @@ section[id]{scroll-margin-top:72px}
   .wed-album{grid-template-columns:repeat(3,minmax(0,1fr))}
   .wed-album > .wed-wide{grid-column:1 / -1}
 }
-/* Wide screens: the landscape photo takes two thirds of the first row with one portrait beside it
-   (same height), the other two portraits share the second row */
+/* Wide screens, six tracks: a 3:2 landscape over four tracks is as tall as a 3:4 portrait over two,
+   so rows stay level; "--full" landscapes take the whole row. Dense packing fills any gaps. */
 @media (min-width:960px){
-  .wed-album{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .wed-album{grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-flow:dense}
+  .wed-album > figure{grid-column:span 2}
   .wed-album > .wed-wide{grid-column:span 4}
-  .wed-album > figure:nth-child(2){grid-column:span 2}
-  .wed-album > figure:nth-child(n+3){grid-column:span 3}
+  .wed-album > .wed-wide--full{grid-column:1 / -1}
 }
 
 /* ===== Quote ===== */

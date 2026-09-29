@@ -323,16 +323,23 @@ section[id]{scroll-margin-top:72px}
 .wed-place p{font-size:15.5px;line-height:1.7;color:var(--wed-soft);margin:0 0 16px}
 
 /* ===== Guestbook ===== */
-.wed-guestbook{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
-.wed-wishes{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));gap:clamp(14px,2vw,24px)}
-.wed-wishes .card{animation:vpnh-rise .5s ease both}
-@media (prefers-reduced-motion:reduce){.wed-wishes .card{animation:none}}
-.wed-wishes .card-kicker{margin:0}
-.wed-wish-status{font-family:var(--font-heading);font-style:italic;font-size:17px;line-height:1.6;color:color-mix(in srgb,var(--color-text) 65%,transparent);margin:0;text-align:center}
-.wed-wishes:not(:empty) + .wed-wish-status{display:none}
-.wed-wish-more{display:flex;margin:clamp(18px,3vw,28px) auto 0}
-.wed-wishes .card-title{margin:0}
+/* Wishes ride a full-width strip that slides left on its own; the form sits underneath */
+.wed-wrap--strip{padding-bottom:0}
+.wed-wrap--strip .wed-title{margin-bottom:clamp(18px,3vw,28px)}
+.wed-wrap--form{max-width:640px;padding-top:clamp(32px,5vw,56px)}
+.wed-wrap--form .wed-kicker{margin-bottom:18px}
+.wed-wishes-strip{position:relative;--wed-wish-w:clamp(250px,72vw,340px);--wed-wish-gap:clamp(14px,2vw,22px)}
+.wed-wishes{display:flex;gap:var(--wed-wish-gap);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:var(--wed-gutter);padding:8px var(--wed-gutter) 14px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.wed-wishes::-webkit-scrollbar{display:none}
+.wed-wishes:focus-visible{outline:2px solid var(--color-accent);outline-offset:-2px}
+.wed-wishes > .card{flex:0 0 var(--wed-wish-w);scroll-snap-align:start;padding:clamp(18px,2.4vw,26px)}
+.wed-wishes .card-kicker,.wed-wishes .card-title{margin:0}
 .wed-wish{font-size:15.5px;line-height:1.7;color:var(--wed-soft);margin:0}
+.wed-wishes-strip::before,.wed-wishes-strip::after{content:"";position:absolute;top:0;bottom:0;width:var(--wed-gutter);pointer-events:none;background:linear-gradient(to right,var(--color-bg),transparent)}
+.wed-wishes-strip::after{right:0;background:linear-gradient(to left,var(--color-bg),transparent)}
+.wed-wishes-strip::before{left:0}
+.wed-wish-status{font-family:var(--font-heading);font-style:italic;font-size:17px;line-height:1.6;color:color-mix(in srgb,var(--color-text) 65%,transparent);margin:0;padding:0 var(--wed-gutter);text-align:center}
+.wed-wishes:not(:empty) + .wed-wish-status{display:none}
 
 /* ===== Mobile action bar & footer ===== */
 .wed-bar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:40;gap:10px;padding:10px 16px;background:color-mix(in srgb,var(--color-bg) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--color-divider)}
@@ -379,9 +386,6 @@ section[id]{scroll-margin-top:72px}
   .wed-story-row > figure,.wed-story-alt > figure{grid-column:1;grid-row:1}
   .wed-story-text,.wed-story-alt .wed-story-text{grid-column:1;grid-row:2;text-align:center}
   .wed-story-body,.wed-story-alt .wed-story-body{margin:0 auto}
-}
-@media (max-width:860px){
-  .wed-guestbook{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:760px){
   .wed-album{grid-template-columns:minmax(0,1fr)}

@@ -428,39 +428,39 @@
 </section>
 
 <section class="wed-band" id="luu-but">
-  <div class="wed-wrap">
+  <div class="wed-wrap wed-wrap--strip">
     <p class="wed-kicker wed-head wed-reveal" data-reveal>Sổ lưu bút</p>
     <h2 class="wed-title wed-head wed-reveal" data-reveal>Lời chúc của mọi người</h2>
-    <div class="wed-guestbook">
-      <form class="wed-form wed-reveal" data-reveal id="wish-form" novalidate>
-        <div class="field">
-          <label for="wish-name" class="wed-flabel">Họ và tên</label>
-          <input id="wish-name" name="name" class="input" type="text" placeholder="Nguyễn Văn A" autocomplete="name" maxlength="80" aria-describedby="wish-name-error">
-          <p class="wed-field-error" id="wish-name-error" hidden></p>
-        </div>
-        <div class="field">
-          <label for="wish-relation" class="wed-flabel">Bạn là <span class="wed-optional">(không bắt buộc)</span></label>
-          <input id="wish-relation" name="relation" class="input" type="text" placeholder="Bạn đại học của Hương" maxlength="80">
-        </div>
-        <div class="field">
-          <label for="wish-message" class="wed-flabel">Lời chúc</label>
-          <div class="wed-presets" data-presets-for="wish-message"></div>
-          <textarea id="wish-message" name="message" class="input" rows="4" maxlength="500" placeholder="Viết đôi lời gửi cô dâu chú rể…" aria-describedby="wish-message-error"></textarea>
-          <p class="wed-field-error" id="wish-message-error" hidden></p>
-        </div>
-        <input class="wed-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <div class="wed-form-actions">
-          <button type="submit" class="btn btn-primary btn-block wed-cta">Gửi lời chúc</button>
-          <p class="wed-form-note" id="wish-thanks" role="status" hidden>Cảm ơn bạn! Lời chúc đã được gửi tới cô dâu chú rể.</p>
-          <p class="wed-form-error" id="wish-error" role="alert" hidden>Chưa gửi được lời chúc. Bạn vui lòng thử lại giúp chúng mình nhé.</p>
-        </div>
-      </form>
-      <div>
-        <div class="wed-wishes" id="wish-list" aria-live="polite"></div>
-        <p class="wed-wish-status" id="wish-status">Đang tải lời chúc…</p>
-        <button type="button" class="btn btn-secondary wed-wish-more" id="wish-more" hidden>Xem thêm lời chúc</button>
+  </div>
+  <div class="wed-wishes-strip">
+    <div class="wed-wishes" id="wish-list" role="region" aria-label="Lời chúc của mọi người"></div>
+    <p class="wed-wish-status" id="wish-status">Đang tải lời chúc…</p>
+  </div>
+  <div class="wed-wrap wed-wrap--form">
+    <p class="wed-kicker wed-head wed-reveal" data-reveal>Gửi lời chúc của bạn</p>
+    <form class="wed-form wed-reveal" data-reveal id="wish-form" novalidate>
+      <div class="field">
+        <label for="wish-name" class="wed-flabel">Họ và tên</label>
+        <input id="wish-name" name="name" class="input" type="text" placeholder="Nguyễn Văn A" autocomplete="name" maxlength="80" aria-describedby="wish-name-error">
+        <p class="wed-field-error" id="wish-name-error" hidden></p>
       </div>
-    </div>
+      <div class="field">
+        <label for="wish-relation" class="wed-flabel">Bạn là <span class="wed-optional">(không bắt buộc)</span></label>
+        <input id="wish-relation" name="relation" class="input" type="text" placeholder="Bạn đại học của Hương" maxlength="80">
+      </div>
+      <div class="field">
+        <label for="wish-message" class="wed-flabel">Lời chúc</label>
+        <div class="wed-presets" data-presets-for="wish-message"></div>
+        <textarea id="wish-message" name="message" class="input" rows="4" maxlength="500" placeholder="Viết đôi lời gửi cô dâu chú rể…" aria-describedby="wish-message-error"></textarea>
+        <p class="wed-field-error" id="wish-message-error" hidden></p>
+      </div>
+      <input class="wed-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="wed-form-actions">
+        <button type="submit" class="btn btn-primary btn-block wed-cta">Gửi lời chúc</button>
+        <p class="wed-form-note" id="wish-thanks" role="status" hidden>Cảm ơn bạn! Lời chúc đã được gửi tới cô dâu chú rể.</p>
+        <p class="wed-form-error" id="wish-error" role="alert" hidden>Chưa gửi được lời chúc. Bạn vui lòng thử lại giúp chúng mình nhé.</p>
+      </div>
+    </form>
   </div>
 </section>
 

@@ -390,16 +390,19 @@
     } catch (e) { store.del('phw-rsvp'); }
   }
 
-  /* ===== Guestbook: wishes are loaded from and saved to the backend ===== */
+  /* ===== Guestbook: wishes are loaded from and saved to the backend =====
+   * They ride a full-width strip that slides one card to the left every few seconds.
+   * The strip is a native scroller (swipe, wheel and keyboard all work); a few cards are
+   * cloned at both ends so it loops without a visible jump. */
   function initGuestbook() {
     const form = $('#wish-form'), list = $('#wish-list');
     if (!form || !list || cfg.showGuestbook === false) return;
-    const status = $('#wish-status'), more = $('#wish-more');
+    const status = $('#wish-status');
     const thanks = $('#wish-thanks'), error = $('#wish-error');
     const submitBtn = $('[type="submit"]', form);
     const messageField = form.elements.message.closest('.field');
-    const PAGE = 6;
-    let wishes = [], shown = PAGE;
+    const SLIDE_EVERY = 3000;
+    let wishes = [], step = 0, reps = 0, timer = 0, settle = 0, held = false, hovered = false, inView = true;
 
     const card = (wish) => {
       const el = document.createElement('article');
@@ -415,12 +418,80 @@
       add('wed-wish', wish.message);
       return el;
     };
-    const render = () => {
-      list.replaceChildren(...wishes.slice(0, shown).map(card));
-      more.hidden = wishes.length <= shown;
+    const clone = (wish) => { const el = card(wish); el.setAttribute('aria-hidden', 'true'); return el; };
+    const n = () => wishes.length;
+    const mod = (i) => ((i % n()) + n()) % n();
+    // Which wish sits at the left edge right now
+    const current = () => step ? mod(Math.round((list.scrollLeft - reps * step) / step)) : 0;
+    const jumpTo = (i) => { list.scrollLeft = (reps + i) * step; };
+
+    const render = (first) => {
       status.textContent = 'Hãy là người đầu tiên gửi lời chúc tới cô dâu chú rể.';
+      if (!n()) { list.replaceChildren(); stop(); return; }
+      const keep = first === undefined ? current() : first;
+      const cards = wishes.map(card);
+      list.replaceChildren(...cards);
+      // Fractional: card widths come from vw, and a rounded step would drift off the snap points
+      step = cards[0].getBoundingClientRect().width + (parseFloat(getComputedStyle(list).columnGap) || 0);
+      // Enough clones on each side to fill the viewport plus one card
+      reps = Math.ceil(list.clientWidth / step) + 1;
+      const before = [], after = [];
+      for (let k = 0; k < reps; k++) {
+        before.push(clone(wishes[mod(k - reps)]));
+        after.push(clone(wishes[mod(k)]));
+      }
+      list.prepend(...before);
+      list.append(...after);
+      jumpTo(keep);
+      schedule();
     };
-    const prepend = (wish) => { wishes.unshift(wish); render(); };
+    const prepend = (wish) => { wishes.unshift(wish); render(0); };
+
+    // Once the scroller settles beyond the real cards, slip back by one lap: same picture, new position
+    const wrap = () => {
+      if (!step || !n()) return;
+      const x = list.scrollLeft, lo = reps * step, hi = (reps + n()) * step;
+      if (x >= hi - 2) list.scrollLeft = x - n() * step;
+      else if (x < lo - 2) list.scrollLeft = x + n() * step;
+    };
+    const stop = () => { clearTimeout(timer); timer = 0; };
+    const schedule = () => {
+      stop();
+      if (reducedMotion || n() < 2) return;
+      timer = setTimeout(slide, SLIDE_EVERY);
+    };
+    const slide = () => {
+      timer = 0;
+      if (held || hovered || !inView || document.hidden) return;
+      wrap();
+      list.scrollTo({ left: (Math.round(list.scrollLeft / step) + 1) * step, behavior: 'smooth' });
+      schedule();
+    };
+    list.addEventListener('scroll', () => {
+      clearTimeout(settle);
+      settle = setTimeout(wrap, 120);
+      if (timer) schedule(); // any movement pushes the next slide back
+    }, { passive: true });
+    list.addEventListener('pointerdown', () => { held = true; });
+    const release = () => { held = false; schedule(); };
+    list.addEventListener('pointerup', release);
+    list.addEventListener('pointercancel', release);
+    list.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') hovered = true; });
+    list.addEventListener('pointerleave', () => { hovered = false; held = false; schedule(); });
+    list.addEventListener('focusin', () => { hovered = true; });
+    list.addEventListener('focusout', () => { hovered = false; schedule(); });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) schedule(); });
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        inView = entries[0].isIntersecting;
+        if (inView) schedule();
+      }, { threshold: 0.2 }).observe(list);
+    }
+    let resizeTimer = 0;
+    addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => { if (n()) render(); }, 150);
+    });
     const validateMessage = () => {
       const message = form.elements.message.value.trim()
         ? '' : 'Bạn vui lòng viết đôi lời chúc, hoặc chọn một lời chúc có sẵn nhé.';
@@ -428,7 +499,6 @@
       return !message;
     };
 
-    more.addEventListener('click', () => { shown += PAGE; render(); });
     document.addEventListener('phw:wish', (e) => prepend(e.detail));
 
     form.addEventListener('submit', async (e) => {
@@ -477,7 +547,7 @@
     api.wishes().then((loaded) => {
       // Keep anything the guest sent while the list was still loading
       wishes = wishes.concat(loaded);
-      render();
+      render(0);
     }).catch(() => {
       status.textContent = 'Chưa tải được lời chúc. Bạn thử tải lại trang nhé.';
     });

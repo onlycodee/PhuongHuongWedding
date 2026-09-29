@@ -81,12 +81,190 @@
       img.alt = slot.getAttribute('data-alt') || '';
       img.decoding = 'async';
       if (!slot.hasAttribute('data-eager')) img.loading = 'lazy';
-      img.addEventListener('load', () => slot.classList.add('is-filled'));
+      img.addEventListener('load', () => {
+        slot.classList.add('is-filled');
+        if (!slot.classList.contains('wed-slot--qr')) lightbox.add(slot, src, img.alt);
+      });
       img.addEventListener('error', () => img.remove());
       img.src = src;
       slot.appendChild(img);
     }
   }
+
+  /* ===== Lightbox: tap a photo to see it large; pinch, wheel, double-tap or the buttons zoom; drag to pan.
+     A larger copy named "<name>-full.webp" is shown when it exists, otherwise the slot image is used. ===== */
+  const lightbox = (() => {
+    const items = [];
+    let box = null, stage, img, caption, count, zoomLabel, prevBtns = [], nextBtns = [];
+    let index = 0, scale = 1, tx = 0, ty = 0, fullReq = 0;
+    const MAX = 5;
+    const icon = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const btn = (cls, label, html) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'wed-lb-btn ' + cls; b.setAttribute('aria-label', label); b.innerHTML = html; return b; };
+
+    const build = () => {
+      box = document.createElement('div');
+      box.className = 'wed-lb';
+      box.setAttribute('role', 'dialog');
+      box.setAttribute('aria-modal', 'true');
+      box.setAttribute('aria-label', 'Xem ảnh');
+      box.hidden = true;
+      const top = document.createElement('div'); top.className = 'wed-lb-bar wed-lb-bar--top';
+      caption = document.createElement('p'); caption.className = 'wed-lb-caption';
+      const close = btn('wed-lb-close', 'Đóng', icon('M6 6l12 12M18 6L6 18'));
+      top.append(caption, close);
+      stage = document.createElement('div'); stage.className = 'wed-lb-stage';
+      img = document.createElement('img'); img.className = 'wed-lb-img'; img.draggable = false;
+      stage.append(img);
+      const prev = btn('wed-lb-nav wed-lb-nav--prev', 'Ảnh trước', icon('M15 5l-7 7 7 7'));
+      const next = btn('wed-lb-nav wed-lb-nav--next', 'Ảnh tiếp theo', icon('M9 5l7 7-7 7'));
+      const bottom = document.createElement('div'); bottom.className = 'wed-lb-bar wed-lb-bar--bottom';
+      const prevM = btn('wed-lb-nav--m', 'Ảnh trước', icon('M15 5l-7 7 7 7'));
+      const nextM = btn('wed-lb-nav--m', 'Ảnh tiếp theo', icon('M9 5l7 7-7 7'));
+      const minus = btn('', 'Thu nhỏ', icon('M5 12h14'));
+      const plus = btn('', 'Phóng to', icon('M12 5v14M5 12h14'));
+      zoomLabel = btn('wed-lb-zoom', 'Về kích thước vừa màn hình', '100%');
+      count = document.createElement('p'); count.className = 'wed-lb-count';
+      bottom.append(prevM, minus, zoomLabel, plus, nextM, count);
+      box.append(top, stage, prev, next, bottom);
+      document.body.append(box);
+      prevBtns = [prev, prevM]; nextBtns = [next, nextM];
+
+      close.addEventListener('click', hide);
+      prevBtns.forEach((b) => b.addEventListener('click', () => show(index - 1)));
+      nextBtns.forEach((b) => b.addEventListener('click', () => show(index + 1)));
+      minus.addEventListener('click', () => zoomTo(scale / 1.5));
+      plus.addEventListener('click', () => zoomTo(scale * 1.5));
+      zoomLabel.addEventListener('click', () => zoomTo(1));
+      stage.addEventListener('click', (e) => { if (e.target === stage && scale === 1) hide(); });
+      stage.addEventListener('dblclick', (e) => zoomTo(scale > 1 ? 1 : 2.5, point(e)));
+      stage.addEventListener('wheel', (e) => { e.preventDefault(); zoomTo(scale * (e.deltaY < 0 ? 1.15 : 1 / 1.15), point(e)); }, { passive: false });
+      document.addEventListener('keydown', (e) => {
+        if (box.hidden) return;
+        if (e.key === 'Escape') hide();
+        else if (e.key === 'ArrowLeft') show(index - 1);
+        else if (e.key === 'ArrowRight') show(index + 1);
+        else if (e.key === '+' || e.key === '=') zoomTo(scale * 1.5);
+        else if (e.key === '-') zoomTo(scale / 1.5);
+        else if (e.key === '0') zoomTo(1);
+      });
+
+      // Pointers: one drags, two pinch. A short single tap on the image toggles zoom.
+      const pts = new Map();
+      let pinch = null, drag = null, lastTap = 0;
+      stage.addEventListener('pointerdown', (e) => {
+        stage.setPointerCapture(e.pointerId);
+        pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (pts.size === 2) {
+          const [a, b] = [...pts.values()];
+          pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), s: scale, c: point({ clientX: (a.x + b.x) / 2, clientY: (a.y + b.y) / 2 }) };
+          drag = null;
+          stage.classList.add('is-pinching');
+        } else if (pts.size === 1) {
+          drag = { x: e.clientX, y: e.clientY, tx, ty, moved: false, t: performance.now() };
+        }
+      });
+      stage.addEventListener('pointermove', (e) => {
+        if (!pts.has(e.pointerId)) return;
+        pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (pinch && pts.size === 2) {
+          const [a, b] = [...pts.values()];
+          const d = Math.hypot(a.x - b.x, a.y - b.y);
+          apply(pinch.s * d / pinch.d, pinch.c, true);
+        } else if (drag) {
+          const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+          if (Math.hypot(dx, dy) > 4) { drag.moved = true; stage.classList.add('is-dragging'); }
+          if (drag.moved && scale > 1) { tx = drag.tx + dx; ty = drag.ty + dy; clampPan(); render(); }
+        }
+      });
+      const up = (e) => {
+        pts.delete(e.pointerId);
+        if (pinch && pts.size < 2) { pinch = null; stage.classList.remove('is-pinching'); zoomTo(scale); }
+        if (drag && pts.size === 0) {
+          const quick = !drag.moved && performance.now() - drag.t < 300;
+          if (quick && e.target === img && e.pointerType === 'touch') {
+            const now = performance.now();
+            if (now - lastTap < 320) { zoomTo(scale > 1 ? 1 : 2.5, point(e)); lastTap = 0; } else lastTap = now;
+          }
+          drag = null;
+          stage.classList.remove('is-dragging');
+        }
+      };
+      stage.addEventListener('pointerup', up);
+      stage.addEventListener('pointercancel', up);
+    };
+
+    // Pointer position relative to the stage centre
+    const point = (e) => { const r = stage.getBoundingClientRect(); return { x: e.clientX - r.left - r.width / 2, y: e.clientY - r.top - r.height / 2 }; };
+    const clampPan = () => {
+      const r = stage.getBoundingClientRect();
+      const w = img.clientWidth * scale, h = img.clientHeight * scale;
+      const mx = Math.max(0, (w - r.width) / 2 + 24), my = Math.max(0, (h - r.height) / 2 + 24);
+      tx = Math.min(mx, Math.max(-mx, tx));
+      ty = Math.min(my, Math.max(-my, ty));
+    };
+    const render = () => {
+      img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+      zoomLabel.textContent = Math.round(scale * 100) + '%';
+      stage.classList.toggle('is-zoomed', scale > 1);
+    };
+    // Zoom so that the point under the cursor/fingers stays put
+    const apply = (s, at, live) => {
+      s = Math.min(MAX, Math.max(1, s));
+      if (at) { const k = s / scale; tx = at.x - (at.x - tx) * k; ty = at.y - (at.y - ty) * k; }
+      scale = s;
+      if (scale === 1) tx = ty = 0;
+      clampPan();
+      render();
+    };
+    const zoomTo = (s, at) => apply(s, at);
+
+    const show = (i) => {
+      index = (i + items.length) % items.length;
+      const it = items[index];
+      scale = 1; tx = ty = 0;
+      img.src = it.src;
+      img.alt = it.alt;
+      caption.textContent = it.alt;
+      count.textContent = (index + 1) + ' / ' + items.length;
+      render();
+      // Swap in the sharper copy once it has loaded (ignore if the guest moved on)
+      const req = ++fullReq;
+      const full = it.src.replace(/\.(webp|jpe?g|png)$/i, '-full.$1');
+      if (full !== it.src) {
+        const pre = new Image();
+        pre.addEventListener('load', () => { if (req === fullReq) img.src = full; });
+        pre.src = full;
+      }
+      const one = items.length < 2;
+      prevBtns.concat(nextBtns).forEach((b) => { b.disabled = one; });
+    };
+    const open = (i) => {
+      if (!box) build();
+      box.hidden = false;
+      document.documentElement.style.overflow = 'hidden';
+      show(i);
+      $('.wed-lb-close', box).focus({ preventScroll: true });
+    };
+    const hide = () => {
+      box.hidden = true;
+      document.documentElement.style.overflow = '';
+      const it = items[index];
+      if (it) it.slot.focus({ preventScroll: true });
+    };
+
+    return {
+      add(slot, src, alt) {
+        const i = items.length;
+        items.push({ slot, src, alt });
+        slot.classList.add('is-zoomable');
+        slot.tabIndex = 0;
+        slot.setAttribute('role', 'button');
+        slot.setAttribute('aria-label', 'Phóng to ảnh: ' + alt);
+        slot.addEventListener('click', () => open(i));
+        slot.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(i); } });
+      }
+    };
+  })();
   function initMaps() {
     const maps = cfg.maps || {};
     for (const a of $$('[data-map]')) {

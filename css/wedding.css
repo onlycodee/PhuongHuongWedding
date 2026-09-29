@@ -196,17 +196,24 @@ section[id]{scroll-margin-top:72px}
 .wed-hero-frame{position:absolute;inset:clamp(14px,2.4vw,32px);overflow:hidden;box-shadow:var(--shadow-lg),0 40px 90px -40px color-mix(in srgb,var(--wed-primary) 45%,transparent)}
 .wed-hero-frame::after{content:"";position:absolute;inset:12px;border:1px solid color-mix(in srgb,var(--color-bg) 70%,transparent);pointer-events:none;z-index:1}
 .wed-hero-frame .wed-slot{position:absolute;inset:0;height:100%;aspect-ratio:auto!important}
-.wed-hero-frame .wed-slot img{object-position:50% 18%}
-/* Line-art sprigs on two corners of the frame, in the accent colour */
-.wed-sprig-corner{position:absolute;width:clamp(120px,15vw,230px);aspect-ratio:1;color:var(--color-accent-700);opacity:.85;pointer-events:none;filter:drop-shadow(0 1px 0 var(--color-bg))}
+.wed-hero-frame .wed-slot img{object-position:50% 62%}
+/* Eucalyptus sprigs on the paper around the words, like a printed card: one at the top-left,
+   one turned round at the bottom-right. Leaves are lightly filled in the accent colour. */
+.wed-hero-text{position:relative;isolation:isolate}
+.wed-sprig-corner{position:absolute;z-index:-1;width:clamp(150px,17vw,250px);aspect-ratio:1;color:var(--color-accent-700);pointer-events:none}
 .wed-sprig-corner svg{width:100%;height:100%;display:block}
-.wed-sprig-corner--tl{left:-8px;top:-4px;transform:scaleX(-1)}
-.wed-sprig-corner--br{right:-8px;bottom:-4px;transform:rotate(180deg) scaleX(-1)}
+.wed-sprig .l{fill:currentColor;fill-opacity:.18}
+.wed-sprig .v{opacity:.45}
+.wed-sprig .b{fill:currentColor;fill-opacity:.4}
+.wed-sprig-corner--tl{left:clamp(-24px,-2vw,-8px);top:clamp(6px,2vw,26px)}
+.wed-sprig-corner--br{right:clamp(-24px,-2vw,-8px);bottom:clamp(6px,2vw,26px);transform:rotate(180deg)}
 @media (max-width:820px){
   .wed-hero{grid-template-columns:minmax(0,1fr);min-height:0}
   .wed-hero-photo{order:-1;min-height:0;aspect-ratio:4/5;max-height:88svh;margin:0}
   .wed-hero-text{padding-top:clamp(28px,6vw,40px)}
-  .wed-sprig-corner{width:clamp(90px,26vw,140px)}
+  .wed-sprig-corner{width:clamp(110px,30vw,160px)}
+  .wed-sprig-corner--tl{left:-6px;top:0}
+  .wed-sprig-corner--br{right:-6px;bottom:0}
 }
 .wed-hero-text .wed-name{font-size:min(20cqw,108px);margin:2px 0 0}
 .wed-hero-kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700);font-feature-settings:'tnum' 1;margin:0 0 20px}
@@ -314,9 +321,13 @@ section[id]{scroll-margin-top:72px}
   .wed-album{grid-template-columns:repeat(3,minmax(0,1fr))}
   .wed-album > .wed-wide{grid-column:1 / -1}
 }
+/* Wide screens: the landscape photo takes two thirds of the first row with one portrait beside it
+   (same height), the other two portraits share the second row */
 @media (min-width:960px){
-  .wed-album{grid-template-columns:repeat(5,minmax(0,1fr))}
-  .wed-album > .wed-wide{grid-column:span 2}
+  .wed-album{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .wed-album > .wed-wide{grid-column:span 4}
+  .wed-album > figure:nth-child(2){grid-column:span 2}
+  .wed-album > figure:nth-child(n+3){grid-column:span 3}
 }
 
 /* ===== Quote ===== */
@@ -325,12 +336,26 @@ section[id]{scroll-margin-top:72px}
 .wed-quote figcaption{font-size:15.5px;line-height:1.7;color:color-mix(in srgb,var(--color-text) 65%,transparent);margin:clamp(24px,3vw,40px) 0 0;text-align:center}
 
 /* ===== RSVP ===== */
-.wed-rsvp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:clamp(28px,5vw,64px);align-items:start}
-.wed-rsvp .wed-title{margin-bottom:18px}
-.wed-rsvp .wed-lead{max-width:44ch}
-.wed-form{border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:clamp(22px,3vw,32px);display:grid;gap:20px;align-content:start}
-.wed-flabel{display:block;margin-bottom:8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 58%,transparent)}
-.wed-events{display:grid;gap:10px;margin-top:2px}
+/* RSVP: heading centred above a wide form laid out in two columns, so it reads across rather than down */
+.wed-rsvp{display:grid;gap:clamp(28px,4vw,44px);max-width:calc(1040px + 2 * var(--wed-gutter))}
+.wed-rsvp-head{text-align:center}
+.wed-rsvp .wed-title{margin-bottom:14px}
+.wed-rsvp .wed-lead{max-width:52ch;margin:0 auto;font-size:17px}
+.wed-form{border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:clamp(22px,3vw,36px);display:grid;gap:22px;align-content:start;font-size:16px}
+.wed-form .input{font-size:16px;min-height:46px}
+.wed-form .radio,.wed-form .seg-opt{font-size:16px}
+.wed-form--rsvp{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"name side" "events guests" "events note" "actions actions";column-gap:clamp(24px,3.5vw,44px);row-gap:22px}
+.wed-form--rsvp .f-name{grid-area:name}
+.wed-form--rsvp .f-side{grid-area:side}
+.wed-form--rsvp .f-events{grid-area:events}
+.wed-form--rsvp .f-guests{grid-area:guests}
+.wed-form--rsvp .f-note{grid-area:note}
+.wed-form--rsvp .wed-form-actions{grid-area:actions;justify-self:center;width:min(100%,420px)}
+@media (max-width:760px){
+  .wed-form--rsvp{grid-template-columns:minmax(0,1fr);grid-template-areas:"name" "side" "events" "guests" "note" "actions"}
+}
+.wed-flabel{display:block;margin-bottom:9px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:color-mix(in srgb,var(--color-text) 62%,transparent)}
+.wed-events{display:grid;gap:12px;margin-top:2px}
 .wed-box{width:16px;height:16px;flex:none;border:1.5px solid var(--color-divider);border-radius:var(--radius-sm);display:inline-block;position:relative}
 .radio:hover .wed-box{border-color:var(--color-accent)}
 .radio input:checked + .wed-box{border-color:var(--color-accent);background:var(--color-accent);box-shadow:inset 0 0 0 2px var(--color-bg)}

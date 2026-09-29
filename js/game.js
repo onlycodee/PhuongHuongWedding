@@ -390,11 +390,16 @@
   };
 
   // Rules first: nothing moves until the guest presses "Bắt đầu"
+  // The card is offered once per browser. After that, whether the guest played or pressed
+  // "Để sau", no petal count or golden heart brings it back; only the lab button does.
+  const seen = () => Boolean(store.get('phw-game-seen'));
   function start(origin) {
     if ((g && g.playing) || !card.hidden) return;
     const def = MODES[mode];
     pops = hearts = 0;
+    store.set('phw-game-seen', '1');
     removeLure();
+    clearTimeout(lureTimer);
     if (lab) lab.open = false;
     card.textContent = '';
     const go = el('button', 'btn btn-primary wed-cta', 'Bắt đầu');
@@ -579,7 +584,7 @@
   };
   // Popped petals quietly count up; the fourth one turns out to be a game
   document.addEventListener('phw:pop', (e) => {
-    if ((g && g.playing) || !card.hidden) return;
+    if ((g && g.playing) || !card.hidden || seen()) return;
     if (++pops >= POPS_TO_START) start(e.detail);
     else floatText(e.detail.x, e.detail.y, '✦ ' + pops);
   });
@@ -603,7 +608,8 @@
   };
   // from: { x, y } makes the heart rise out of a spot on the page (a thank-you message);
   // otherwise it drifts down from the top
-  function releaseLure(from) {
+  function releaseLure(from, force) {
+    if (seen() && !force) return;
     if ((g && g.playing) || !card.hidden || document.hidden) { if (!from) scheduleLure(8, 14); return; }
     if (!from && ++luresShown > MAX_LURES) return;
     removeLure();
@@ -657,7 +663,7 @@
       }, 900);
     }).observe(node, { attributes: true, attributeFilter: ['hidden'] });
   });
-  scheduleLure(7, 12);
+  if (!seen()) scheduleLure(7, 12);
 
   /* ===== Lab switcher (prototype only): pick a mechanic without hunting for a petal ===== */
   function initLab() {
@@ -682,15 +688,15 @@
     const play = el('button', 'btn btn-primary wed-cta', 'Chơi ngay');
     play.type = 'button';
     play.addEventListener('click', () => start());
-    const wipe = el('button', 'wed-theme-chip', 'Xoá điểm & ẩn bảng');
+    const wipe = el('button', 'wed-theme-chip', 'Xoá điểm & xem lại từ đầu');
     wipe.type = 'button';
     wipe.addEventListener('click', () => {
-      try { ['phw-game-scores', 'phw-game-played', 'phw-game-name'].forEach((k) => localStorage.removeItem(k)); } catch (e) {}
+      try { ['phw-game-scores', 'phw-game-played', 'phw-game-name', 'phw-game-seen'].forEach((k) => localStorage.removeItem(k)); } catch (e) {}
       renderBoard();
     });
     const drop = el('button', 'wed-theme-chip', 'Thả tim vàng ngay');
     drop.type = 'button';
-    drop.addEventListener('click', () => { lab.open = false; luresShown = 0; releaseLure(); });
+    drop.addEventListener('click', () => { lab.open = false; luresShown = 0; releaseLure(null, true); });
     lab.append(chips, play, drop, wipe);
     document.body.append(lab);
     setMode(choice, true);

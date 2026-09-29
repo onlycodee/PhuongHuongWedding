@@ -391,9 +391,9 @@
   }
 
   /* ===== Guestbook: wishes are loaded from and saved to the backend =====
-   * They ride a full-width strip that slides one card to the left every few seconds.
-   * The strip is a native scroller (swipe, wheel and keyboard all work); a few cards are
-   * cloned at both ends so it loops without a visible jump. */
+   * One wish shows at a time; it slides to the next every few seconds, and arrows either
+   * side page by hand. The strip is a native scroller (swipe, wheel and keyboard all work);
+   * a few cards are cloned at both ends so it loops without a visible jump. */
   function initGuestbook() {
     const form = $('#wish-form'), list = $('#wish-list');
     if (!form || !list || cfg.showGuestbook === false) return;
@@ -413,11 +413,12 @@
         p.textContent = text; // textContent, never innerHTML: wishes are untrusted input
         el.appendChild(p);
       };
-      if (wish.relation) add('card-kicker', wish.relation);
-      add('card-title', wish.name);
       add('wed-wish', wish.message);
+      add('card-title', wish.name);
+      if (wish.relation) add('card-kicker', wish.relation);
       return el;
     };
+    const prev = $('#wish-prev'), next = $('#wish-next'), count = $('#wish-count');
     const clone = (wish) => { const el = card(wish); el.setAttribute('aria-hidden', 'true'); return el; };
     const n = () => wishes.length;
     const mod = (i) => ((i % n()) + n()) % n();
@@ -427,7 +428,7 @@
 
     const render = (first) => {
       status.textContent = 'Hãy là người đầu tiên gửi lời chúc tới cô dâu chú rể.';
-      if (!n()) { list.replaceChildren(); stop(); return; }
+      if (!n()) { list.replaceChildren(); list.style.height = ''; prev.hidden = next.hidden = count.hidden = true; stop(); return; }
       const keep = first === undefined ? current() : first;
       const cards = wishes.map(card);
       list.replaceChildren(...cards);
@@ -442,11 +443,19 @@
       }
       list.prepend(...before);
       list.append(...after);
+      prev.hidden = next.hidden = count.hidden = n() < 2;
       jumpTo(keep);
+      fit(reps + keep);
       schedule();
     };
     const prepend = (wish) => { wishes.unshift(wish); render(0); };
 
+    // The strip is as tall as the wish on show, not the longest one
+    const fit = (slot) => {
+      const el = list.children[slot];
+      if (el) list.style.height = el.offsetHeight + 'px';
+      count.textContent = (mod(slot - reps) + 1) + ' / ' + n();
+    };
     // Once the scroller settles beyond the real cards, slip back by one lap: same picture, new position
     const wrap = () => {
       if (!step || !n()) return;
@@ -454,22 +463,30 @@
       if (x >= hi - 2) list.scrollLeft = x - n() * step;
       else if (x < lo - 2) list.scrollLeft = x + n() * step;
     };
+    const settled = () => { wrap(); fit(Math.round(list.scrollLeft / step)); };
     const stop = () => { clearTimeout(timer); timer = 0; };
     const schedule = () => {
       stop();
       if (reducedMotion || n() < 2) return;
       timer = setTimeout(slide, SLIDE_EVERY);
     };
+    const go = (dir) => {
+      wrap();
+      const slot = Math.round(list.scrollLeft / step) + dir;
+      list.scrollTo({ left: slot * step, behavior: reducedMotion ? 'auto' : 'smooth' });
+      fit(slot);
+      schedule();
+    };
     const slide = () => {
       timer = 0;
       if (held || hovered || !inView || document.hidden) return;
-      wrap();
-      list.scrollTo({ left: (Math.round(list.scrollLeft / step) + 1) * step, behavior: 'smooth' });
-      schedule();
+      go(1);
     };
+    prev.addEventListener('click', () => go(-1));
+    next.addEventListener('click', () => go(1));
     list.addEventListener('scroll', () => {
       clearTimeout(settle);
-      settle = setTimeout(wrap, 120);
+      settle = setTimeout(settled, 120);
       if (timer) schedule(); // any movement pushes the next slide back
     }, { passive: true });
     list.addEventListener('pointerdown', () => { held = true; });

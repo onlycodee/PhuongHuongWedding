@@ -328,18 +328,30 @@ section[id]{scroll-margin-top:72px}
 .wed-wrap--strip .wed-title{margin-bottom:clamp(18px,3vw,28px)}
 .wed-wrap--form{max-width:640px;padding-top:clamp(32px,5vw,56px)}
 .wed-wrap--form .wed-kicker{margin-bottom:18px}
-.wed-wishes-strip{position:relative;--wed-wish-w:clamp(250px,72vw,340px);--wed-wish-gap:clamp(14px,2vw,22px)}
-.wed-wishes{display:flex;gap:var(--wed-wish-gap);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:var(--wed-gutter);padding:8px var(--wed-gutter) 14px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+/* One wish at a time, arrows either side; the strip's height follows the wish on show */
+.wed-wishes-strip{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;grid-template-areas:"prev list next" ". count ." ". status .";align-items:center;column-gap:clamp(12px,2.5vw,28px);row-gap:16px;max-width:900px;margin:0 auto;padding:0 var(--wed-gutter)}
+.wed-wishes{grid-area:list;display:flex;align-items:flex-start;gap:40px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;transition:height .4s ease}
 .wed-wishes::-webkit-scrollbar{display:none}
 .wed-wishes:focus-visible{outline:2px solid var(--color-accent);outline-offset:-2px}
-.wed-wishes > .card{flex:0 0 var(--wed-wish-w);scroll-snap-align:start;padding:clamp(18px,2.4vw,26px)}
-.wed-wishes .card-kicker,.wed-wishes .card-title{margin:0}
-.wed-wish{font-size:15.5px;line-height:1.7;color:var(--wed-soft);margin:0}
-.wed-wishes-strip::before,.wed-wishes-strip::after{content:"";position:absolute;top:0;bottom:0;width:var(--wed-gutter);pointer-events:none;background:linear-gradient(to right,var(--color-bg),transparent)}
-.wed-wishes-strip::after{right:0;background:linear-gradient(to left,var(--color-bg),transparent)}
-.wed-wishes-strip::before{left:0}
-.wed-wish-status{font-family:var(--font-heading);font-style:italic;font-size:17px;line-height:1.6;color:color-mix(in srgb,var(--color-text) 65%,transparent);margin:0;padding:0 var(--wed-gutter);text-align:center}
-.wed-wishes:not(:empty) + .wed-wish-status{display:none}
+.wed-wishes > .card{flex:0 0 100%;scroll-snap-align:start;text-align:center;padding:clamp(24px,4vw,44px) clamp(20px,4vw,48px);gap:0}
+.wed-wish{font-family:var(--font-heading);font-style:italic;font-size:clamp(19px,2.4vw,26px);line-height:1.55;color:var(--color-text);margin:0}
+.wed-wish::before{content:"“ "}
+.wed-wish::after{content:" ”"}
+.wed-wishes .card-title{margin:clamp(16px,2.4vw,24px) 0 0;font-size:16px;letter-spacing:.02em}
+.wed-wishes .card-kicker{margin:6px 0 0}
+.wed-wish-nav{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border-radius:50%;border:1px solid var(--color-divider);background:transparent;color:var(--color-accent-700);cursor:pointer;transition:background-color .25s ease,border-color .25s ease}
+.wed-wish-nav:hover{background:var(--color-accent-100);border-color:var(--color-accent)}
+.wed-wish-nav:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+.wed-wish-prev{grid-area:prev}
+.wed-wish-next{grid-area:next}
+.wed-wish-count{grid-area:count;margin:0;text-align:center;font-size:12px;letter-spacing:.14em;color:var(--wed-soft)}
+.wed-wish-status{grid-area:status;font-family:var(--font-heading);font-style:italic;font-size:17px;line-height:1.6;color:color-mix(in srgb,var(--color-text) 65%,transparent);margin:0;text-align:center}
+.wed-wishes:not(:empty) ~ .wed-wish-status{display:none}
+@media (max-width:640px){
+  .wed-wishes-strip{grid-template-columns:44px minmax(0,1fr) 44px;grid-template-areas:"list list list" "prev count next" "status status status";column-gap:16px}
+  .wed-wish-prev{justify-self:end}
+  .wed-wish-next{justify-self:start}
+}
 
 /* ===== Mobile action bar & footer ===== */
 .wed-bar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:40;gap:10px;padding:10px 16px;background:color-mix(in srgb,var(--color-bg) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--color-divider)}

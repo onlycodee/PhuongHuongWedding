@@ -40,10 +40,10 @@
   --font-heading:"EB Garamond",Garamond,serif;
   --font-body:"Be Vietnam Pro",system-ui,sans-serif;
   --font-heading-weight:500;--wed-body-weight:300;--wed-h-space:-.004em;
-  --wed-background:#f8f3ec;--wed-surface:#e8d9cf;
-  --wed-primary:#6b2737;--wed-secondary:#e8d9cf;--wed-accent:#d4a5a5;
-  --wed-text:#3b3030;
-  --wed-primary-deep:#571e2c;--wed-accent-deep:#8a5a5a;
+  --wed-background:#faf4ee;--wed-surface:#efdcd4;
+  --wed-primary:#6b2737;--wed-secondary:#e8d9cf;--wed-accent:#c08f84;
+  --wed-text:#3b2d2d;
+  --wed-primary-deep:#4a1624;--wed-accent-deep:#8a5a5a;
   --wed-primary-tint:#f4e8ea;--wed-accent-tint:#f9edec;
 }
 [data-wed-theme="truyen-thong"]{
@@ -87,6 +87,9 @@
   --color-accent-2-800:color-mix(in srgb,var(--wed-accent-deep) 78%,#000);
   --color-accent-2-900:color-mix(in srgb,var(--wed-accent-deep) 58%,#000);
 
+  /* Ink and gold used on the deep bands (countdown, quote, footer, opening envelope) */
+  --wed-dark-ink:#f8eee6;--wed-dark-gold:#e6c98f;
+
   --wed-gutter:clamp(20px,5vw,72px);
   --wed-soft:color-mix(in srgb,var(--color-text) 78%,transparent);
   --wed-danger:#a3362a;
@@ -113,18 +116,24 @@ section[id]{scroll-margin-top:72px}
    True colours (classical.css tints plates sepia) with a tiny lift against WebP flatness.
    Depth comes from the frame, a soft vignette and a hover response, not from tinting the pixels. */
 .plate{filter:none;box-shadow:var(--shadow-md),0 18px 40px -22px color-mix(in srgb,var(--wed-primary-deep) 45%,transparent);transition:transform .35s ease,box-shadow .35s ease}
-.wed-slot img{filter:contrast(1.04) saturate(1.06);transition:transform .5s ease,filter .35s ease}
+/* --py / --sc let scroll parallax (.wed-par, set from js) and the hover zoom share one transform */
+.wed-slot img{filter:contrast(1.04) saturate(1.06);transform:translate3d(0,var(--py,0px),0) scale(var(--sc,1));transition:transform .5s ease,filter .35s ease}
+.wed-slot.is-filled img{animation:wed-img-in .9s ease both}
+@keyframes wed-img-in{from{opacity:0}}
+.wed-par img{--sc:1.14;transition:filter .35s ease}
 .wed-slot.is-filled::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 clamp(24px,5vw,64px) color-mix(in srgb,var(--wed-primary-deep) 16%,transparent)}
 .wed-slot--qr img{filter:none}
 .wed-slot--qr::after{display:none}
 @media (hover:hover){
   .plate:has(.is-zoomable):hover{transform:translateY(-3px);box-shadow:var(--shadow-lg),0 30px 54px -24px color-mix(in srgb,var(--wed-primary-deep) 55%,transparent)}
-  .plate:has(.is-zoomable):hover .wed-slot img{transform:scale(1.035);filter:contrast(1.04) saturate(1.06) brightness(1.03)}
+  .plate:has(.is-zoomable):hover .wed-slot img{--sc:1.035;filter:contrast(1.04) saturate(1.06) brightness(1.03)}
+  .plate:has(.is-zoomable):hover .wed-slot.wed-par img{--sc:1.17}
 }
 @media (prefers-reduced-motion:reduce){
   .plate,.wed-slot img{transition:none}
+  .wed-slot.is-filled img{animation:none}
   .plate:has(.is-zoomable):hover{transform:none}
-  .plate:has(.is-zoomable):hover .wed-slot img{transform:none}
+  .plate:has(.is-zoomable):hover .wed-slot img{--sc:1}
 }
 .btn-secondary,.btn-ghost{color:var(--color-text)}
 .btn-primary{transition:box-shadow .45s ease,background-color .3s ease,color .3s ease}
@@ -210,14 +219,13 @@ section[id]{scroll-margin-top:72px}
 .wed-hero{position:relative;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,3vw,48px);align-items:center;max-width:1360px;margin:0 auto;padding:clamp(36px,5vw,72px) var(--wed-gutter)}
 .wed-hero-text{container-type:inline-size;animation:vpnh-rise .7s ease both;text-align:center;width:100%;max-width:640px;justify-self:center}
 .wed-hero-photo{position:relative;margin:0;width:100%;max-width:680px;justify-self:center;aspect-ratio:4/5;animation:vpnh-rise .9s ease both}
-.wed-hero-frame{position:absolute;inset:0;overflow:hidden;border:1px solid var(--color-accent-2);box-shadow:var(--shadow-lg),0 30px 70px -30px color-mix(in srgb,var(--wed-primary) 40%,transparent)}
-.wed-hero-frame::after{content:"";position:absolute;inset:10px;border:1px solid color-mix(in srgb,var(--color-bg) 70%,transparent);pointer-events:none;z-index:1}
+/* The portrait sits in an arch, with a second thin arch offset behind it */
+.wed-hero-frame{position:absolute;inset:0;overflow:hidden;border:1px solid var(--color-accent-2);border-radius:999px 999px 6px 6px;box-shadow:var(--shadow-lg),0 30px 70px -30px color-mix(in srgb,var(--wed-primary) 40%,transparent)}
+.wed-hero-frame::after{content:"";position:absolute;inset:10px;border:1px solid color-mix(in srgb,#fff 62%,transparent);border-radius:999px 999px 3px 3px;pointer-events:none;z-index:1}
+.wed-hero-photo::before{content:"";position:absolute;inset:-14px;border:1px solid var(--color-accent-2);border-radius:999px 999px 10px 10px;opacity:.65;pointer-events:none}
 .wed-hero-frame .wed-slot{position:absolute;inset:0;height:100%;aspect-ratio:auto!important}
-.wed-hero-frame .wed-slot img{object-position:50% 30%}
-@media (max-width:820px){
-  .wed-hero{grid-template-columns:minmax(0,1fr);gap:28px}
-  .wed-hero-photo{order:-1;max-width:min(100%,560px)}
-}
+.wed-hero-frame .wed-slot img{object-position:50% 24%}
+.wed-hero-frame .wed-slot.is-filled::after{box-shadow:none}
 .wed-hero-text .wed-name{font-size:min(20cqw,108px);margin:2px 0 0}
 .wed-hero-kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700);font-feature-settings:'tnum' 1;margin:0 0 20px}
 .wed-hero-text .wed-amp{font-size:clamp(30px,3.4vw,46px);margin:2px 0 0}
@@ -227,6 +235,25 @@ section[id]{scroll-margin-top:72px}
 .wed-hero-text .wed-lead{margin:20px auto 0;max-width:46ch}
 .wed-hero-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:28px}
 .wed-hero-actions .btn-secondary{min-height:50px}
+@media (max-width:820px){
+  /* Phones: the photo fills the first screen and the names sit on it, so the invitation reads at a glance */
+  .wed-hero{display:block;max-width:none;padding:0;min-height:calc(100svh - 68px);overflow:hidden;isolation:isolate}
+  .wed-hero-photo{position:absolute;inset:0;max-width:none;width:auto;aspect-ratio:auto;justify-self:stretch;z-index:-1}
+  .wed-hero-photo::before{display:none}
+  .wed-hero-photo::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,color-mix(in srgb,var(--wed-primary-deep) 94%,transparent) 0,color-mix(in srgb,var(--wed-primary-deep) 78%,transparent) 30%,color-mix(in srgb,var(--wed-primary-deep) 18%,transparent) 62%,transparent 80%)}
+  .wed-hero-frame{border:0;border-radius:0;box-shadow:none}
+  .wed-hero-frame::after{inset:14px;border-radius:0;border-color:color-mix(in srgb,var(--wed-dark-gold) 55%,transparent)}
+  .wed-hero-frame .wed-slot img{object-position:50% 22%}
+  .wed-hero-text{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:calc(100svh - 68px);max-width:none;padding:0 clamp(26px,7vw,48px) 112px;color:var(--wed-dark-ink)}
+  .wed-hero-text .wed-name{font-size:min(19cqw,84px);text-shadow:0 2px 24px rgba(40,8,18,.55)}
+  .wed-hero-text .wed-amp{color:var(--wed-dark-gold)}
+  .wed-hero-kicker{color:var(--wed-dark-gold);margin-bottom:10px}
+  .wed-hero-date span{color:var(--wed-dark-ink)}
+  .wed-hero-date i{background:var(--wed-dark-gold)}
+  .wed-hero-date{margin-top:18px}
+  .wed-hero-text .wed-lead{display:none}
+  .wed-hero-actions{display:none}
+}
 
 /* ===== Lightbox: any filled photo opens large, with pinch / wheel / button zoom and drag to pan ===== */
 .wed-slot.is-zoomable{cursor:zoom-in}
@@ -455,13 +482,99 @@ section[id]{scroll-margin-top:72px}
 [data-wed-theme="truyen-thong"] .btn-primary{background:var(--wed-primary);border-color:var(--wed-primary);color:var(--wed-ivory)}
 [data-wed-theme="truyen-thong"] .btn-primary:hover{background:var(--wed-primary-deep);border-color:var(--wed-primary-deep);color:var(--wed-ivory)}
 [data-wed-theme="truyen-thong"] .plate{border:1px solid var(--wed-secondary)}
-[data-wed-theme="truyen-thong"] .wed-countdown{background:color-mix(in srgb,var(--wed-primary) 93%,var(--wed-ivory));border-color:transparent}
-[data-wed-theme="truyen-thong"] .wed-cd-row p{color:var(--wed-ivory)}
-[data-wed-theme="truyen-thong"] .wed-cd-row .wed-cd-num--days{color:#f3dca9}
-[data-wed-theme="truyen-thong"] .wed-cd-row p:not(:first-child){opacity:.92}
-[data-wed-theme="truyen-thong"] .wed-cd{border-color:color-mix(in srgb,var(--wed-ivory) 32%,transparent)}
-[data-wed-theme="truyen-thong"] .wed-cd-cell + .wed-cd-cell::before{background:color-mix(in srgb,var(--wed-ivory) 32%,transparent)}
 [data-wed-theme="truyen-thong"] .tag-accent,[data-wed-theme="truyen-thong"] .tag-outline{border-color:var(--wed-primary);color:var(--wed-primary-deep)}
+
+/* ===== Deep bands: give the page a light / dark rhythm ===== */
+.wed-dark{position:relative;color:var(--wed-dark-ink);border-color:transparent;background:radial-gradient(120% 170% at 50% -30%,color-mix(in srgb,var(--wed-primary) 78%,var(--wed-primary-deep)),var(--wed-primary-deep) 58%,color-mix(in srgb,var(--wed-primary-deep) 66%,#000))}
+.wed-dark--photo{background:linear-gradient(180deg,color-mix(in srgb,var(--wed-primary-deep) 94%,transparent),color-mix(in srgb,var(--wed-primary-deep) 88%,transparent)),url("../assets/photos/album-7.webp") center 38%/cover}
+.wed-dark .wed-kicker,.wed-dark .wed-cd-kicker{color:var(--wed-dark-gold)}
+.wed-dark .wed-cd-rule{background:linear-gradient(to right,transparent,var(--wed-dark-gold))}
+.wed-dark .wed-cd-kicker > .wed-cd-rule:last-child{background:linear-gradient(to left,transparent,var(--wed-dark-gold))}
+.wed-dark .wed-cd-when,.wed-dark .wed-cd-num{color:var(--wed-dark-ink)}
+.wed-dark .wed-cd-num--days{color:var(--wed-dark-gold)}
+.wed-dark .wed-cd-lbl{color:color-mix(in srgb,var(--wed-dark-ink) 72%,transparent)}
+.wed-dark .wed-cd-place{color:color-mix(in srgb,var(--wed-dark-ink) 80%,transparent)}
+.wed-dark .wed-cd{border-color:color-mix(in srgb,var(--wed-dark-gold) 34%,transparent)}
+.wed-dark .wed-cd-cell + .wed-cd-cell::before{background:color-mix(in srgb,var(--wed-dark-gold) 30%,transparent)}
+.wed-dark .wed-cd-cell + .wed-cd-cell::after{background:var(--wed-dark-gold);opacity:.9}
+.wed-dark .wed-quote blockquote{color:var(--wed-dark-ink)}
+.wed-dark .wed-quote figcaption{color:color-mix(in srgb,var(--wed-dark-ink) 78%,transparent)}
+.wed-quote::before{content:"“";display:block;text-align:center;font-family:var(--font-heading);font-size:clamp(84px,10vw,130px);line-height:.6;height:.5em;color:var(--wed-dark-gold);opacity:.8;margin-bottom:clamp(10px,2vw,22px)}
+.wed-footer.wed-dark{border-top:0}
+.wed-footer.wed-dark::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(to right,transparent,var(--wed-dark-gold),transparent);opacity:.7}
+.wed-footer .wed-name{color:var(--wed-dark-ink)}
+.wed-footer .wed-amp{color:var(--wed-dark-gold);margin:0 .12em}
+.wed-footer-note{color:color-mix(in srgb,var(--wed-dark-ink) 72%,transparent)}
+/* Softly tinted band so the light sections do not all look the same */
+.wed-tint{background:color-mix(in srgb,var(--wed-surface) 52%,transparent)}
+
+/* ===== Section details ===== */
+/* Timeline diamonds light up once their row has been revealed */
+.js .wed-story-row.wed-in::after{background:var(--color-accent-2);box-shadow:0 0 0 5px var(--color-bg),0 0 16px color-mix(in srgb,var(--color-accent-2) 70%,transparent);transition:background .8s ease .35s,box-shadow .8s ease .35s}
+/* Album photos rise and settle as they come into view */
+.js .wed-album .wed-reveal{transform:translateY(22px) scale(.965)}
+.js .wed-album .wed-reveal.wed-in{transform:none}
+@media (prefers-reduced-motion:reduce){.js .wed-album .wed-reveal{transform:none}}
+/* QR codes get a white mat and a thin gold frame */
+.wed-slot--qr{background:#fff;box-shadow:0 0 0 5px var(--color-bg),0 0 0 6px var(--color-accent-2)}
+
+/* ===== Opening envelope =====
+   Two velvet curtains and a wax seal. Shown only while <html> has .intro-on (set by the head script);
+   tapping the seal fades the words, then the curtains part to reveal the invitation. */
+.wed-intro{display:none}
+.intro-on body{overflow:hidden}
+.intro-on .wed-intro{display:block;position:fixed;inset:0;z-index:200;color:var(--wed-dark-ink)}
+.intro-on .wed-hero-text,.intro-on .wed-hero-photo{animation-play-state:paused}
+.wed-intro-panel{position:absolute;left:0;right:0;height:50.2%;transition:transform 1.25s cubic-bezier(.76,0,.24,1) .5s;
+  background:repeating-linear-gradient(90deg,rgba(0,0,0,.09) 0 2px,transparent 2px 26px),radial-gradient(90% 75% at 50% 50%,#8b2f45,#5a1a2b 55%,#2c0c15);background-size:100% 200%,100% 200%}
+.wed-intro-panel--top{top:0;background-position:0 0,0 0}
+.wed-intro-panel--bottom{bottom:0;background-position:0 100%,0 100%}
+.wed-intro-body{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.6vh,14px);padding:clamp(40px,8vh,72px) 28px;text-align:center;transition:opacity .55s ease}
+.wed-intro-body::before{content:"";position:absolute;inset:clamp(14px,2.6vw,30px);border:1px solid color-mix(in srgb,var(--wed-dark-gold) 60%,transparent);outline:1px solid color-mix(in srgb,var(--wed-dark-gold) 28%,transparent);outline-offset:6px;pointer-events:none}
+.wed-intro-kicker{margin:0;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--wed-dark-gold)}
+.wed-intro-names{display:flex;flex-direction:column;align-items:center;margin:0;font-size:clamp(50px,13vw,96px);line-height:1}
+.wed-intro-names .wed-name{font-size:inherit;color:var(--wed-dark-ink);text-shadow:0 2px 26px rgba(0,0,0,.4)}
+.wed-intro-names .wed-amp{font-size:.5em;color:var(--wed-dark-gold);margin:.04em 0}
+.wed-intro-date{margin:4px 0 clamp(14px,3vh,28px);font-family:var(--font-heading);font-size:clamp(18px,2.6vw,24px);letter-spacing:.14em;font-feature-settings:'tnum' 1;color:var(--wed-dark-ink)}
+.wed-seal{position:relative;display:grid;place-items:center;width:112px;height:112px;padding:0;cursor:pointer;border:0;color:#f3dfae;
+  border-radius:50% 46% 52% 48% / 47% 53% 47% 53%;
+  background:radial-gradient(circle at 34% 28%,#d1506b,#a1233d 44%,#6a1428 100%);
+  box-shadow:inset 0 0 0 5px rgba(255,255,255,.07),inset 0 -8px 16px rgba(0,0,0,.4),0 14px 34px rgba(0,0,0,.55);
+  animation:wed-seal-pulse 2.6s ease-in-out infinite;transition:transform .7s cubic-bezier(.5,0,.3,1),opacity .5s ease}
+.wed-seal::before{content:"";position:absolute;inset:13px;border-radius:50%;border:1px solid rgba(243,223,174,.55);box-shadow:inset 0 0 0 3px rgba(0,0,0,.12)}
+.wed-seal span{position:relative;font-family:"Great Vibes",cursive;font-size:40px;line-height:1;text-shadow:0 1px 0 rgba(0,0,0,.45)}
+.wed-seal i{font-style:normal;font-size:.7em;margin:0 1px}
+.wed-seal:focus-visible,.wed-intro-silent:focus-visible{outline:2px solid var(--wed-dark-gold);outline-offset:6px}
+@keyframes wed-seal-pulse{50%{transform:scale(1.06);box-shadow:inset 0 0 0 5px rgba(255,255,255,.07),inset 0 -8px 16px rgba(0,0,0,.4),0 14px 40px rgba(0,0,0,.55),0 0 0 14px rgba(230,201,143,.12)}}
+.wed-intro-hint{margin:6px 0 0;font-size:13px;letter-spacing:.12em;color:color-mix(in srgb,var(--wed-dark-ink) 78%,transparent)}
+.wed-intro-silent{margin-top:6px;padding:8px 10px;background:transparent;border:0;cursor:pointer;font:inherit;font-size:13px;color:color-mix(in srgb,var(--wed-dark-ink) 70%,transparent);text-decoration:underline;text-underline-offset:4px}
+.wed-intro-silent:hover{color:var(--wed-dark-ink)}
+.wed-intro.is-opening .wed-intro-body{opacity:0;pointer-events:none}
+.wed-intro.is-opening .wed-seal{animation:none;transform:scale(1.35) rotate(10deg);opacity:0}
+.wed-intro.is-opening .wed-intro-panel--top{transform:translateY(-101%)}
+.wed-intro.is-opening .wed-intro-panel--bottom{transform:translateY(101%)}
+@media (prefers-reduced-motion:reduce){
+  .wed-seal{animation:none}
+  .intro-on .wed-intro{transition:opacity .35s ease}
+  .wed-intro-panel,.wed-intro-body,.wed-seal{transition:none}
+  .wed-intro.is-opening{opacity:0}
+}
+
+/* ===== Music button ===== */
+.wed-music{position:fixed;left:18px;bottom:22px;z-index:45;display:grid;place-items:center;width:46px;height:46px;padding:0;cursor:pointer;border-radius:50%;border:1px solid var(--color-accent-2);background:color-mix(in srgb,var(--color-bg) 90%,transparent);backdrop-filter:blur(8px);box-shadow:var(--shadow-md);transition:transform .25s ease,box-shadow .25s ease}
+.wed-music:hover{transform:scale(1.06)}
+.wed-music:focus-visible{outline:2px solid var(--color-accent);outline-offset:3px}
+.intro-on .wed-music{display:none}
+.wed-eq{position:relative;display:flex;align-items:flex-end;gap:3px;height:18px}
+.wed-eq i{display:block;width:3px;height:5px;border-radius:2px;background:var(--wed-primary)}
+.wed-music[aria-pressed="true"] .wed-eq i{animation:wed-eq 1.05s ease-in-out infinite}
+.wed-eq i:nth-child(2){animation-delay:-.35s!important}
+.wed-eq i:nth-child(3){animation-delay:-.7s!important}
+.wed-eq i:nth-child(4){animation-delay:-.2s!important}
+@keyframes wed-eq{0%,100%{height:5px}50%{height:18px}}
+.wed-music[aria-pressed="false"] .wed-eq::after{content:"";position:absolute;left:-4px;right:-4px;top:50%;height:1.5px;background:var(--wed-primary);transform:rotate(-38deg)}
+@media (prefers-reduced-motion:reduce){.wed-music[aria-pressed="true"] .wed-eq i{animation:none;height:12px}}
+@media (max-width:600px){.wed-music{left:auto;right:14px;bottom:calc(84px + env(safe-area-inset-bottom))}}
 
 /* ===== Responsive ===== */
 /* The nav collapses a little before the 860px layout breakpoint: with no-wrap links and the

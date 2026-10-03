@@ -7,12 +7,24 @@
 <meta name="description" content="Trân trọng kính mời quý vị đến chung vui trong Lễ thành hôn của Việt Phương và Ninh Hương, Chủ Nhật 18/10/2026.">
 <meta property="og:title" content="Việt Phương &amp; Ninh Hương — Lễ thành hôn 18 · 10 · 2026">
 <meta property="og:description" content="Trân trọng kính mời quý vị đến chung vui trong ngày hạnh phúc của hai gia đình.">
-<meta property="og:image" content="assets/photos/hero.webp">
+<!-- Link previews (Zalo, Facebook, Messenger) need an absolute image URL -->
+<meta property="og:image" content="https://onlycodee.github.io/PhuongHuongWedding/assets/photos/share.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Việt Phương và Ninh Hương trước tấm rèm nhung đỏ">
+<meta property="og:url" content="https://onlycodee.github.io/PhuongHuongWedding/">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:site_name" content="Việt Phương &amp; Ninh Hương">
 <meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#571e2c">
+<link rel="preload" as="image" href="assets/photos/hero.webp" fetchpriority="high">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%234f6046' d='M16 28C4 19 3 12 6.5 8.5 9.6 5.4 14 6.6 16 10c2-3.4 6.4-4.6 9.5-1.5C29 12 28 19 16 28z'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Be+Vietnam+Pro:wght@200;300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Lora:ital,wght@0,400;1,400&family=Noto+Serif+Display:ital,wght@0,400;0,500;1,400&family=Noto+Serif:wght@400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Great+Vibes&display=swap">
+<!-- Fonts load without blocking first paint or the scripts (media swap), so the hero photo is not held up by them -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Be+Vietnam+Pro:wght@200;300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Lora:ital,wght@0,400;1,400&family=Noto+Serif+Display:ital,wght@0,400;0,500;1,400&family=Noto+Serif:wght@400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Great+Vibes&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Be+Vietnam+Pro:wght@200;300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Lora:ital,wght@0,400;1,400&family=Noto+Serif+Display:ital,wght@0,400;0,500;1,400&family=Noto+Serif:wght@400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Great+Vibes&display=swap"></noscript>
 <link rel="stylesheet" href="css/classical.css">
 <link rel="stylesheet" href="css/wedding.css">
 <link rel="stylesheet" href="css/game.css">
@@ -29,12 +41,38 @@
   var root = document.documentElement;
   root.setAttribute('data-wed-theme', theme || 'hien-dai');
   root.classList.add('js');
+  // Opening envelope: once per browser session, skippable with ?intro=0
+  try {
+    var skip = new URLSearchParams(location.search).get('intro') === '0';
+    if (cfg.intro && !skip && !sessionStorage.getItem('phw-intro') && !location.hash) {
+      root.classList.add('intro-on');
+      // The envelope always opens onto the top of the page, not a scroll position restored by the browser
+      history.scrollRestoration = 'manual';
+    }
+  } catch (e) {}
 })();
 </script>
 <script src="js/wedding.js" defer></script>
 <script src="js/game.js" defer></script>
 </head>
 <body>
+
+<!-- Opening envelope: two curtains with a wax seal. Shown only while <html> has .intro-on (see the head script). -->
+<div class="wed-intro" id="intro" role="dialog" aria-modal="true" aria-label="Mở thiệp mời">
+  <div class="wed-intro-panel wed-intro-panel--top"></div>
+  <div class="wed-intro-panel wed-intro-panel--bottom"></div>
+  <div class="wed-intro-body">
+    <p class="wed-intro-kicker">Trân trọng kính mời</p>
+    <p class="wed-intro-names"><span class="wed-name">Việt Phương</span><span class="wed-amp">&amp;</span><span class="wed-name">Ninh Hương</span></p>
+    <p class="wed-intro-date">18 · 10 · 2026</p>
+    <button type="button" class="wed-seal" id="intro-open" aria-label="Mở thiệp mời"><span>P<i>&amp;</i>H</span></button>
+    <p class="wed-intro-hint">Chạm vào con dấu để mở thiệp</p>
+    <button type="button" class="wed-intro-silent" id="intro-silent" hidden>Mở thiệp không nhạc</button>
+  </div>
+</div>
+
+<button type="button" class="wed-music" id="music-toggle" aria-pressed="false" aria-label="Bật nhạc nền" hidden><span class="wed-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
+<audio id="bgm" loop preload="none"></audio>
 
 <nav class="nav wed-nav">
   <span class="nav-brand">V.Phương &amp; N.Hương</span>
@@ -86,7 +124,7 @@
   </figure>
 </header>
 
-<section class="wed-countdown wed-band wed-band--both" id="dem-nguoc">
+<section class="wed-countdown wed-band wed-band--both wed-dark" id="dem-nguoc">
   <div class="wed-cd-row wed-reveal" data-reveal>
     <p class="wed-cd-kicker"><span class="wed-cd-rule"></span>Còn lại đến Lễ thành hôn<span class="wed-cd-rule"></span></p>
     <p class="wed-cd-when">11:00 AM · Chủ Nhật, 18/10/2026</p>
@@ -204,7 +242,7 @@
   </div>
 </section>
 
-<section id="su-kien" class="wed-band" data-atm=".45">
+<section id="su-kien" class="wed-band wed-tint" data-atm=".45">
   <div class="wed-wrap">
     <p class="wed-kicker wed-head wed-reveal" data-reveal>Lịch trình</p>
     <h2 class="wed-title wed-head wed-reveal" data-reveal style="margin-bottom:clamp(28px,4vw,44px)">Bốn buổi lễ, hai ngày</h2>
@@ -320,7 +358,7 @@
   </div>
 </section>
 
-<section class="wed-band wed-band--both">
+<section class="wed-band wed-band--both wed-dark wed-dark--photo">
   <figure class="wed-quote wed-reveal" data-reveal>
     <blockquote>“Yêu nhau là cùng nhìn về một hướng — hôm nay hai gia đình xin được cùng nhìn về một mái nhà.”</blockquote>
     <figcaption>— Kính mời quý vị cùng hai họ nâng ly</figcaption>
@@ -389,7 +427,7 @@
   </div>
 </section>
 
-<section class="wed-band" id="mung-cuoi">
+<section class="wed-band wed-tint" id="mung-cuoi">
   <div class="wed-wrap wed-gift">
     <p class="wed-kicker wed-head wed-reveal" data-reveal>Hộp mừng cưới</p>
     <h2 class="wed-title wed-head wed-reveal" data-reveal>Gửi lời chúc từ xa</h2>
@@ -438,7 +476,7 @@
   </div>
 </section>
 
-<section class="wed-band" id="luu-but">
+<section class="wed-band wed-tint" id="luu-but">
   <div class="wed-wrap wed-wrap--strip">
     <p class="wed-kicker wed-head wed-reveal" data-reveal>Sổ lưu bút</p>
     <h2 class="wed-title wed-head wed-reveal" data-reveal>Lời chúc của mọi người</h2>
@@ -483,7 +521,7 @@
   <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
 </div>
 
-<footer class="wed-footer">
+<footer class="wed-footer wed-dark">
   <div>
     <p class="wed-name">Việt Phương <span class="wed-amp">&amp;</span> Ninh Hương</p>
     <p class="wed-footer-note">18 · 10 · 2026 — Cảm ơn bạn đã ở bên chúng tôi</p>

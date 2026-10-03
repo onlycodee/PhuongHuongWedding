@@ -2,9 +2,14 @@
 // so index.html and wedding.js never have to be touched.
 window.WEDDING_CONFIG = {
   // Default theme: 'hien-dai' | 'sage' | 'navy' | 'rose' | 'truyen-thong'
-  theme: 'hien-dai',
+  theme: 'rose',
   // Shows the theme strip so guests can switch palettes. Set to false once a theme is final.
-  showThemePicker: true,
+  showThemePicker: false,
+
+  // Opening envelope + background music (assets/audio/song.mp3). Guests start the song by tapping the
+  // seal; the round button in the corner turns it on and off. Set music.src to '' to drop the music.
+  intro: true,
+  music: { src: 'assets/audio/song.mp3', volume: 0.55 },
 
   showCountdown: true,
   showGift: true,

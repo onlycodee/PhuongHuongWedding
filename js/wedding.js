@@ -172,6 +172,7 @@
           apply(pinch.s * d / pinch.d, pinch.c, true);
         } else if (drag) {
           const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+          drag.dx = dx; drag.dy = dy;
           if (Math.hypot(dx, dy) > 4) { drag.moved = true; stage.classList.add('is-dragging'); }
           if (drag.moved && scale > 1) { tx = drag.tx + dx; ty = drag.ty + dy; clampPan(); render(); }
         }
@@ -184,6 +185,10 @@
           if (quick && e.target === img && e.pointerType === 'touch') {
             const now = performance.now();
             if (now - lastTap < 320) { zoomTo(scale > 1 ? 1 : 2.5, point(e)); lastTap = 0; } else lastTap = now;
+          }
+          // A clear sideways flick on an unzoomed photo turns to the next / previous one
+          if (e.type === 'pointerup' && drag.moved && scale === 1 && Math.abs(drag.dx) > 60 && Math.abs(drag.dx) > Math.abs(drag.dy) * 1.5) {
+            show(index + (drag.dx < 0 ? 1 : -1));
           }
           drag = null;
           stage.classList.remove('is-dragging');
@@ -1030,9 +1035,98 @@
     return { configure };
   }
 
+  /* ===== Background music: the round button in the corner, started by the tap on the opening seal ===== */
+  const music = (() => {
+    const conf = cfg.music || {};
+    const audio = $('#bgm'), btn = $('#music-toggle');
+    if (!conf.src || !audio || !btn) return { available: false, play() {} };
+    audio.src = conf.src;
+    const level = conf.volume == null ? 0.55 : conf.volume;
+    let on = false, fade = 0, hiddenWhilePlaying = false;
+    const sync = () => {
+      btn.setAttribute('aria-pressed', String(on));
+      btn.setAttribute('aria-label', on ? 'Tắt nhạc nền' : 'Bật nhạc nền');
+    };
+    // Glide the volume so the song never starts or stops abruptly
+    const glide = (to, done) => {
+      clearInterval(fade);
+      fade = setInterval(() => {
+        const next = audio.volume + Math.sign(to - audio.volume) * 0.04;
+        audio.volume = Math.min(1, Math.max(0, Math.abs(to - next) < 0.04 ? to : next));
+        if (audio.volume === to) { clearInterval(fade); if (done) done(); }
+      }, 60);
+    };
+    const play = () => {
+      audio.volume = 0;
+      const started = audio.play();
+      on = true; sync();
+      glide(level);
+      // Autoplay can still be refused; then the button simply stays "off"
+      if (started && started.catch) started.catch(() => { on = false; sync(); });
+    };
+    const pause = () => { on = false; sync(); glide(0, () => audio.pause()); };
+    btn.addEventListener('click', () => (on ? pause() : play()));
+    // Stop while the tab is in the background, resume when the guest returns
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && on) { hiddenWhilePlaying = true; audio.pause(); }
+      else if (!document.hidden && hiddenWhilePlaying) { hiddenWhilePlaying = false; audio.play().catch(() => {}); }
+    });
+    btn.hidden = false;
+    sync();
+    return { available: true, play };
+  })();
+
+  /* ===== Opening envelope: tap the wax seal (music on) or the quiet link; shown once per browser session ===== */
+  function initIntro() {
+    const intro = $('#intro');
+    if (!intro || !root.classList.contains('intro-on')) return;
+    const seal = $('#intro-open', intro), quiet = $('#intro-silent', intro);
+    if (music.available) quiet.hidden = false;
+    // A reload can restore a scroll position far down the page; the invitation should open at the top
+    scrollTo(0, 0);
+    seal.focus({ preventScroll: true });
+    let opened = false;
+    const open = (withMusic) => {
+      if (opened) return;
+      opened = true;
+      try { sessionStorage.setItem('phw-intro', '1'); } catch (e) {}
+      if (withMusic) music.play();
+      if (reducedMotion) { root.classList.remove('intro-on'); return; }
+      intro.classList.add('is-opening');
+      // Words fade (.55s), then the curtains part (.5s delay + 1.25s)
+      setTimeout(() => root.classList.remove('intro-on'), 1900);
+    };
+    seal.addEventListener('click', () => open(true));
+    quiet.addEventListener('click', () => open(false));
+  }
+
+  /* ===== Story photos drift slightly against the scroll ===== */
+  function initParallax() {
+    const slots = $$('.wed-story .wed-slot');
+    if (reducedMotion || !slots.length) return;
+    slots.forEach((s) => s.classList.add('wed-par'));
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      for (const s of slots) {
+        const r = s.getBoundingClientRect();
+        if (r.bottom < -80 || r.top > innerHeight + 80) continue;
+        // -1 when the photo is entering from below, +1 when it leaves at the top
+        const p = (r.top + r.height / 2 - innerHeight / 2) / (innerHeight / 2 + r.height / 2);
+        s.style.setProperty('--py', (-p * r.height * 0.06).toFixed(1) + 'px');
+      }
+    };
+    const queue = () => { if (!raf) raf = requestAnimationFrame(update); };
+    addEventListener('scroll', queue, { passive: true });
+    addEventListener('resize', queue, { passive: true });
+    update();
+  }
+
   initThemes();
+  initIntro();
   initSections();
   initPhotos();
+  initParallax();
   initMaps();
   initGift();
   initPopovers();

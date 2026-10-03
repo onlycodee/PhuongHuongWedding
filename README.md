@@ -35,7 +35,8 @@ without a backend.
 | `css/wedding.css` | The five palettes and the page layout |
 | `calendar/*.ics` | One calendar file per event (must keep CRLF line endings — see `.gitattributes`) |
 | `backend/Code.gs` | Apps Script that writes to the Google Sheet and serves the wish list |
-| `assets/photos/` | Wedding photos, QR codes, map screenshots |
+| `assets/photos/` | Wedding photos, QR codes, map screenshots, `share.jpg` (the 1200×630 link preview) |
+| `assets/audio/song.mp3` | Background music, started by the tap on the opening seal |
 
 ## Before sending the invitation
 
@@ -44,8 +45,11 @@ without a backend.
    Slots without a photo show a placeholder frame.
 3. **Maps** — replace `maps` with the exact pinned Google Maps links of both venues.
 4. **Gift box** — fill in `gift.groom` / `gift.bride` (bank, account number) and add the QR images.
-5. **Theme** — pick `theme`, then set `showThemePicker: false` if guests should not switch palettes.
+5. **Theme** — the site ships in `rose` (Dusty Rose · Burgundy) with `showThemePicker: false`.
    Preview any palette with `?theme=navy`.
+5b. **Opening envelope and music** — `intro` shows the wax-seal envelope once per browser session
+   (`?intro=0` skips it); `music.src` points at the song, and an empty string removes the music and the button.
+   Only use a song you may publish.
 6. **Event times** — if a time or venue changes, update it in `index.html` (schedule, RSVP options,
    Google Calendar links) and in the matching `calendar/*.ics` file.
 

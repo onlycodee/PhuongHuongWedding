@@ -6,8 +6,8 @@ window.WEDDING_CONFIG = {
   // Shows the theme strip so guests can switch palettes. Set to false once a theme is final.
   showThemePicker: false,
 
-  // Opening envelope + background music (assets/audio/song.mp3). Guests start the song by tapping the
-  // seal; the round button in the corner turns it on and off. Set music.src to '' to drop the music.
+  // Opening curtains + background music (assets/audio/song.mp3). Guests start the song by tapping
+  // "Mở thiệp"; the round button in the corner turns it on and off. Set music.src to '' to drop the music.
   intro: true,
   music: { src: 'assets/audio/song.mp3', volume: 0.55 },
 
@@ -59,18 +59,23 @@ window.WEDDING_CONFIG = {
     'wed-g10': 'assets/photos/album-10.webp',
     'wed-g11': 'assets/photos/album-11.webp',
     'wed-g12': 'assets/photos/album-12.webp',
-    'wed-map-1': '',
-    'wed-map-2': '',
     'wed-qr-groom': '',
     'wed-qr-bride': ''
   },
 
-  // Google Maps links for the two venues (replace with exact pinned links)
+  // Where each venue is on the map: the embedded maps in "Chỉ đường" are drawn from these coordinates
+  // (the "Mở Google Maps" buttons use the links below)
+  mapPoints: {
+    'phu-nhieu': { lat: 20.7621251, lng: 105.8864202 },
+    'tuan-hung': { lat: 20.976221, lng: 106.451235 }
+  },
+
+  // Google Maps links for the two venues (pinned locations)
   maps: {
-    'phu-nhieu': 'https://www.google.com/maps/search/?api=1&query=' +
-      encodeURIComponent('Nhà văn hoá thôn Phú Nhiêu, Phú Xuyên, Hà Nội'),
-    'tuan-hung': 'https://www.google.com/maps/search/?api=1&query=' +
-      encodeURIComponent('Thôn Tuấn Hưng, Lai Khê, Hải Phòng')
+    // Nhà trai — Nhà văn hoá thôn Phú Nhiêu, Hà Nội
+    'phu-nhieu': 'https://maps.app.goo.gl/wuygYBDE575YC3n49',
+    // Nhà gái — thôn Tuấn Hưng, Hải Phòng
+    'tuan-hung': 'https://maps.app.goo.gl/UqZ5Ab8mKspCNC3k8'
   },
 
   // Bank accounts for wedding gifts. An empty account keeps the "to be updated" text.

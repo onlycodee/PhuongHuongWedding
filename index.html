@@ -41,10 +41,11 @@
   var root = document.documentElement;
   root.setAttribute('data-wed-theme', theme || 'hien-dai');
   root.classList.add('js');
-  // Opening envelope: once per browser session, skippable with ?intro=0
+  // Opening envelope: once per browser session; ?intro=0 skips it, ?intro=1 always shows it (handy for previews)
   try {
-    var skip = new URLSearchParams(location.search).get('intro') === '0';
-    if (cfg.intro && !skip && !sessionStorage.getItem('phw-intro') && !location.hash) {
+    var flag = new URLSearchParams(location.search).get('intro');
+    var skip = flag === '0';
+    if (cfg.intro && !skip && (flag === '1' || (!sessionStorage.getItem('phw-intro') && !location.hash))) {
       root.classList.add('intro-on');
       // The envelope always opens onto the top of the page, not a scroll position restored by the browser
       history.scrollRestoration = 'manual';
@@ -57,16 +58,17 @@
 </head>
 <body>
 
-<!-- Opening envelope: two curtains with a wax seal. Shown only while <html> has .intro-on (see the head script). -->
+<!-- Opening: two dusty-rose curtains on a gold rod, drawn apart by the button. Shown only while <html> has .intro-on. -->
 <div class="wed-intro" id="intro" role="dialog" aria-modal="true" aria-label="Mở thiệp mời">
-  <div class="wed-intro-panel wed-intro-panel--top"></div>
-  <div class="wed-intro-panel wed-intro-panel--bottom"></div>
-  <div class="wed-intro-body">
-    <p class="wed-intro-kicker">Trân trọng kính mời</p>
+  <div class="wed-curtain wed-curtain--left"></div>
+  <div class="wed-curtain wed-curtain--right"></div>
+  <div class="wed-rod"></div>
+  <div class="wed-intro-content">
+    <p class="wed-intro-kicker">Thiệp mời đám cưới</p>
     <p class="wed-intro-names"><span class="wed-name">Việt Phương</span><span class="wed-amp">&amp;</span><span class="wed-name">Ninh Hương</span></p>
     <p class="wed-intro-date">18 · 10 · 2026</p>
-    <button type="button" class="wed-seal" id="intro-open" aria-label="Mở thiệp mời"><span>P<i>&amp;</i>H</span></button>
-    <p class="wed-intro-hint">Chạm vào con dấu để mở thiệp</p>
+    <div class="wed-intro-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    <button type="button" class="wed-open" id="intro-open">Mở thiệp <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button type="button" class="wed-intro-silent" id="intro-silent" hidden>Mở thiệp không nhạc</button>
   </div>
 </div>
@@ -259,9 +261,9 @@
           <p class="wed-tl-place">Nhà văn hoá thôn Phú Nhiêu, xã Phú Xuyên, Hà Nội</p>
         </div>
         <div class="wed-tl-actions">
-          <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+          <a href="#chi-duong" class="btn wed-act wed-act--route"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" fill="currentColor"/></svg>Chỉ đường</a>
           <details class="wed-pop wed-cal">
-            <summary class="btn btn-ghost">Thêm vào lịch</summary>
+            <summary class="btn wed-act wed-act--cal"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 13v4M10 15h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Thêm vào lịch</summary>
             <div class="wed-pop-list">
               <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Tiệc+mừng+nhà+trai+—+Việt+Phương+%26+Ninh+Hương&amp;dates=20261017T093000Z/20261017T120000Z&amp;location=Nhà+văn+hoá+thôn+Phú+Nhiêu,+xã+Phú+Xuyên,+Hà+Nội" target="_blank" rel="noopener">Google Calendar</a>
               <a href="calendar/tiec-nha-trai.ics">Apple · Outlook (.ics)</a>
@@ -281,9 +283,9 @@
           <p class="wed-tl-place">Tư gia nhà gái, thôn Tuấn Hưng, xã Lai Khê, TP Hải Phòng</p>
         </div>
         <div class="wed-tl-actions">
-          <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+          <a href="#chi-duong" class="btn wed-act wed-act--route"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" fill="currentColor"/></svg>Chỉ đường</a>
           <details class="wed-pop wed-cal">
-            <summary class="btn btn-ghost">Thêm vào lịch</summary>
+            <summary class="btn wed-act wed-act--cal"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 13v4M10 15h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Thêm vào lịch</summary>
             <div class="wed-pop-list">
               <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Tiệc+mừng+nhà+gái+—+Việt+Phương+%26+Ninh+Hương&amp;dates=20261017T100000Z/20261017T123000Z&amp;location=Tư+gia+nhà+gái,+thôn+Tuấn+Hưng,+xã+Lai+Khê,+TP+Hải+Phòng" target="_blank" rel="noopener">Google Calendar</a>
               <a href="calendar/tiec-nha-gai.ics">Apple · Outlook (.ics)</a>
@@ -303,9 +305,9 @@
           <p class="wed-tl-place">Gia đình nhà gái, thôn Tuấn Hưng, xã Lai Khê, TP Hải Phòng</p>
         </div>
         <div class="wed-tl-actions">
-          <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+          <a href="#chi-duong" class="btn wed-act wed-act--route"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" fill="currentColor"/></svg>Chỉ đường</a>
           <details class="wed-pop wed-cal">
-            <summary class="btn btn-ghost">Thêm vào lịch</summary>
+            <summary class="btn wed-act wed-act--cal"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 13v4M10 15h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Thêm vào lịch</summary>
             <div class="wed-pop-list">
               <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Lễ+vu+quy+—+Việt+Phương+%26+Ninh+Hương&amp;dates=20261018T000000Z/20261018T020000Z&amp;location=Tư+gia+nhà+gái,+thôn+Tuấn+Hưng,+xã+Lai+Khê,+TP+Hải+Phòng" target="_blank" rel="noopener">Google Calendar</a>
               <a href="calendar/le-vu-quy.ics">Apple · Outlook (.ics)</a>
@@ -325,9 +327,9 @@
           <p class="wed-tl-place">Nhà văn hoá thôn Phú Nhiêu, xã Phú Xuyên, Hà Nội</p>
         </div>
         <div class="wed-tl-actions">
-          <a href="#chi-duong" class="btn btn-secondary">Chỉ đường</a>
+          <a href="#chi-duong" class="btn wed-act wed-act--route"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" fill="currentColor"/></svg>Chỉ đường</a>
           <details class="wed-pop wed-cal">
-            <summary class="btn btn-ghost">Thêm vào lịch</summary>
+            <summary class="btn wed-act wed-act--cal"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 13v4M10 15h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Thêm vào lịch</summary>
             <div class="wed-pop-list">
               <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Lễ+thành+hôn+—+Việt+Phương+%26+Ninh+Hương&amp;dates=20261018T040000Z/20261018T070000Z&amp;location=Nhà+văn+hoá+thôn+Phú+Nhiêu,+xã+Phú+Xuyên,+Hà+Nội" target="_blank" rel="noopener">Google Calendar</a>
               <a href="calendar/le-thanh-hon.ics">Apple · Outlook (.ics)</a>
@@ -360,8 +362,8 @@
 
 <section class="wed-band wed-band--both wed-dark wed-dark--photo">
   <figure class="wed-quote wed-reveal" data-reveal>
-    <blockquote>“Yêu nhau là cùng nhìn về một hướng — hôm nay hai gia đình xin được cùng nhìn về một mái nhà.”</blockquote>
-    <figcaption>— Kính mời quý vị cùng hai họ nâng ly</figcaption>
+    <blockquote>“Giữa muôn vàn người trên thế gian, chúng mình đã tìm thấy nhau — và từ hôm nay, sẽ cùng chọn nhau thêm một lần nữa, mỗi ngày.”</blockquote>
+    <figcaption>— Rất mong được đón bạn trong ngày vui của chúng mình</figcaption>
   </figure>
 </section>
 
@@ -388,10 +390,16 @@
     <div class="field f-events" id="rsvp-events" role="group" aria-labelledby="rsvp-events-label" aria-describedby="rsvp-events-error">
       <span class="wed-flabel" id="rsvp-events-label">Bạn dự buổi nào</span>
       <div class="wed-events">
-        <label class="radio"><input type="checkbox" name="events" value="Tiệc nhà trai 17/10"><span class="wed-box"></span>Tiệc nhà trai — 4:30 PM, 17/10/2026</label>
-        <label class="radio"><input type="checkbox" name="events" value="Tiệc nhà gái 17/10"><span class="wed-box"></span>Tiệc nhà gái — 5:00 PM, 17/10/2026</label>
-        <label class="radio"><input type="checkbox" name="events" value="Lễ vu quy 18/10"><span class="wed-box"></span>Lễ vu quy — 7:00 AM, 18/10/2026</label>
-        <label class="radio"><input type="checkbox" name="events" value="Lễ thành hôn 18/10" checked><span class="wed-box"></span>Lễ thành hôn — 11:00 AM, 18/10/2026</label>
+        <div class="wed-ev-group" role="group" aria-label="Nhà trai">
+          <p class="wed-ev-title">Nhà trai</p>
+          <label class="radio"><input type="checkbox" name="events" value="Tiệc nhà trai 17/10"><span class="wed-box"></span>Tiệc nhà trai — 4:30 PM, 17/10/2026</label>
+          <label class="radio"><input type="checkbox" name="events" value="Lễ thành hôn 18/10" checked><span class="wed-box"></span>Lễ thành hôn — 11:00 AM, 18/10/2026</label>
+        </div>
+        <div class="wed-ev-group" role="group" aria-label="Nhà gái">
+          <p class="wed-ev-title">Nhà gái</p>
+          <label class="radio"><input type="checkbox" name="events" value="Tiệc nhà gái 17/10"><span class="wed-box"></span>Tiệc nhà gái — 5:00 PM, 17/10/2026</label>
+          <label class="radio"><input type="checkbox" name="events" value="Lễ vu quy 18/10"><span class="wed-box"></span>Lễ vu quy — 7:00 AM, 18/10/2026</label>
+        </div>
       </div>
       <p class="wed-field-error" id="rsvp-events-error" hidden></p>
     </div>
@@ -431,7 +439,7 @@
   <div class="wed-wrap wed-gift">
     <p class="wed-kicker wed-head wed-reveal" data-reveal>Hộp mừng cưới</p>
     <h2 class="wed-title wed-head wed-reveal" data-reveal>Gửi lời chúc từ xa</h2>
-    <p class="wed-lead">Sự hiện diện của bạn là niềm vui lớn nhất. Nếu không thể đến, bạn có thể gửi lời chúc qua mã QR dưới đây.</p>
+    <p class="wed-lead">Sự hiện diện của bạn là niềm vui lớn nhất của chúng mình. Tấm lòng của bạn, dù ở gần hay ở xa, đều là món quà quý giá nhất.</p>
     <div class="wed-gift-grid">
       <article class="wed-gift-card wed-reveal" data-reveal data-gift="groom">
         <div class="wed-slot wed-slot--qr" data-slot="wed-qr-groom" data-alt="Mã QR mừng cưới nhà trai"><span class="wed-slot-cap">Mã QR</span></div>
@@ -461,13 +469,13 @@
     <h2 class="wed-title wed-head wed-reveal" data-reveal>Hai địa điểm</h2>
     <div class="wed-grid">
       <article class="wed-place wed-reveal" data-reveal>
-        <figure class="plate"><div class="wed-slot" data-slot="wed-map-1" data-alt="Bản đồ Nhà văn hoá thôn Phú Nhiêu" style="aspect-ratio:16/10"><span class="wed-slot-cap">Ảnh chụp bản đồ — Phú Nhiêu</span></div></figure>
+        <figure class="plate wed-map"><iframe data-map-embed="phu-nhieu" title="Bản đồ Nhà văn hoá thôn Phú Nhiêu" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></figure>
         <h3 class="wed-h3">Nhà văn hoá thôn Phú Nhiêu</h3>
         <p>Xã Phú Xuyên, Hà Nội · Tiệc 4:30 PM 17/10/2026 &amp; Lễ thành hôn 11:00 AM 18/10/2026</p>
         <a href="https://maps.google.com" class="btn btn-primary" data-map="phu-nhieu" target="_blank" rel="noopener">Mở Google Maps</a>
       </article>
       <article class="wed-place wed-reveal" data-reveal>
-        <figure class="plate"><div class="wed-slot" data-slot="wed-map-2" data-alt="Bản đồ thôn Tuấn Hưng" style="aspect-ratio:16/10"><span class="wed-slot-cap">Ảnh chụp bản đồ — Tuấn Hưng</span></div></figure>
+        <figure class="plate wed-map"><iframe data-map-embed="tuan-hung" title="Bản đồ thôn Tuấn Hưng, xã Lai Khê" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></figure>
         <h3 class="wed-h3">Tư gia nhà gái, thôn Tuấn Hưng</h3>
         <p>Xã Lai Khê, TP Hải Phòng · Tiệc 5:00 PM 17/10/2026 &amp; Lễ vu quy 7:00 AM 18/10/2026</p>
         <a href="https://maps.google.com" class="btn btn-primary" data-map="tuan-hung" target="_blank" rel="noopener">Mở Google Maps</a>

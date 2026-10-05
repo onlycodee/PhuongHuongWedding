@@ -9,7 +9,8 @@
  * to 0; a round that reaches the goal can be saved to the leaderboard. The leaderboard section
  * at the end of the page only appears for guests who have played.
  *
- * Scores are kept in this browser only (localStorage) until a mechanic is chosen.
+ * The leaderboard ("Bảng vàng") is shared: scores are saved to and read from the Google Sheet behind
+ * apiEndpoint (see backend/Code.gs). Without an endpoint (demo mode) it shows this browser's own scores only.
  */
 (function () {
   'use strict';
@@ -349,27 +350,61 @@
   if (!MODES[choice]) choice = 'random';
   let mode = choice === 'random' ? pickRandom() : choice;
 
+  // The shared board lives in the Google Sheet behind apiEndpoint; without one, only this browser's scores show
+  const endpoint = (window.WEDDING_CONFIG || {}).apiEndpoint;
+  // Same anonymous per-browser ID as the RSVP and guestbook use; it keeps one best score per guest and game
+  const guestId = () => {
+    let id = store.get('phw-guest-id');
+    if (!id) {
+      id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+      store.set('phw-guest-id', id);
+    }
+    return id;
+  };
   const scores = () => { try { return JSON.parse(store.get('phw-game-scores')) || {}; } catch (e) { return {}; } };
   const savedName = () => {
     if (store.get('phw-game-name')) return store.get('phw-game-name');
     try { return (JSON.parse(store.get('phw-rsvp')) || {}).name || ''; } catch (e) { return ''; }
   };
-  // PROTOTYPE: placeholder rows so the board can be judged before a shared backend exists
-  const sampleRows = (goal) => [['Minh Anh', 1.7], ['Quốc Bảo', 1.35], ['Thu Trang', 1.1]]
-    .map(([name, k]) => ({ name, score: Math.round(goal * k), sample: true }));
+  let remote = null, remoteAsked = false;     // { mode: [{ name, score, mine }] } once the sheet has answered
+  const loadRemote = () => {
+    if (!endpoint) return;
+    remoteAsked = true;
+    fetch(endpoint + '?action=scores&guestId=' + encodeURIComponent(guestId()))
+      .then((res) => res.json())
+      .then((data) => { if (data.ok && data.scores) { remote = data.scores; renderBoard(); } })
+      .catch(() => {});
+  };
   const renderBoard = () => {
     board.hidden = !store.get('phw-game-played');
+    if (!board.hidden && endpoint && !remoteAsked) loadRemote();
     const def = MODES[mode];
     boardLead.textContent = 'Bạn đã tìm ra trò chơi ẩn “' + def.name + '”. Đạt từ ' + def.goal +
       ' điểm để ghi tên lên bảng. Muốn chơi lại? Hãy chạm vào bốn cánh hoa đang rơi, hoặc hai trái tim vàng.';
-    const rows = (scores()[mode] || []).concat(sampleRows(def.goal)).sort((a, b) => b.score - a.score).slice(0, 8);
+    // The shared board once it has loaded; until then (or in demo mode) this browser's own best scores
+    const rows = ((remote && remote[mode]) || (scores()[mode] || []).map((r) => ({ name: r.name, score: r.score, mine: true })))
+      .slice().sort((a, b) => b.score - a.score).slice(0, 8);
     boardList.textContent = '';
+    if (!rows.length) {
+      boardList.append(el('li', 'wed-game-empty', 'Chưa có ai ghi tên — bạn có thể là người đầu tiên!'));
+      return;
+    }
     rows.forEach((r, i) => {
-      const li = el('li', 'wed-game-li' + (r.sample ? '' : ' is-me'));
-      li.append(el('span', 'wed-game-rank', String(i + 1)), el('span', 'wed-game-who', r.name + (r.sample ? ' (mẫu)' : '')),
-        el('span', 'wed-game-pts', String(r.score)));
+      const li = el('li', 'wed-game-li' + (r.mine ? ' is-me' : ''));
+      li.append(el('span', 'wed-game-rank', String(i + 1)), el('span', 'wed-game-who', r.name), el('span', 'wed-game-pts', String(r.score)));
       boardList.append(li);
     });
+  };
+  // Sends a finished round to the sheet, shows it at once, then refreshes the board from the sheet
+  const submitScore = (who, final) => {
+    if (!endpoint) return;
+    remote = remote || {};
+    const list = remote[mode] || [];
+    if (!list.some((r) => r.mine && r.score >= final)) remote[mode] = list.filter((r) => !r.mine).concat({ name: who, score: final, mine: true });
+    fetch(endpoint, {
+      method: 'POST',
+      body: new URLSearchParams({ type: 'score', name: who, mode, score: String(final), guestId: guestId(), website: '' })
+    }).then((res) => res.json()).then(loadRemote).catch(() => {});
   };
 
   /* ===== Round ===== */
@@ -546,6 +581,7 @@
         all[mode] = (all[mode] || []).concat({ name: who, score: final, at: Date.now() })
           .sort((a, b) => b.score - a.score).slice(0, 10);
         store.set('phw-game-scores', JSON.stringify(all));
+        submitScore(who, final);
         renderBoard();
         close();
         board.scrollIntoView({ behavior: 'smooth', block: 'center' });

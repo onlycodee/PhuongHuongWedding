@@ -45,10 +45,10 @@ without a backend.
    Slots without a photo show a placeholder frame.
 3. **Maps** — replace `maps` with the exact pinned Google Maps links of both venues.
 4. **Gift box** — fill in `gift.groom` / `gift.bride` (bank, account number) and add the QR images.
-5. **Theme** — the site ships in `rose` (Dusty Rose · Burgundy) with `showThemePicker: false`.
+5. **Theme** — the site ships in `rose` (Dusty Rose · Burgundy). `showThemePicker: true` shows the palette strip so every theme can be tried; set it to `false` once one is chosen. The opening curtains follow the active palette.
    Preview any palette with `?theme=navy`.
-5b. **Opening envelope and music** — `intro` shows the wax-seal envelope once per browser session
-   (`?intro=0` skips it); `music.src` points at the song, and an empty string removes the music and the button.
+5b. **Opening curtains and music** — `intro` shows the curtains once per browser session
+   (`?intro=0` skips it, `?intro=1` always shows it); `music.src` points at the song, and an empty string removes the music and the button.
    Only use a song you may publish.
 6. **Event times** — if a time or venue changes, update it in `index.html` (schedule, RSVP options,
    Google Calendar links) and in the matching `calendar/*.ics` file.

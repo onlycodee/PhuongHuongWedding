@@ -22,16 +22,16 @@
   // Backdrop settings per theme: density, fall speed, opacity,
   // and mix = relative share of each falling shape (dust is the only one that cannot be popped)
   const ATM = {
-    'hien-dai':     { density: 0.55, speed: 0.9,  alpha: 0.5,
-                      mix: { rose: 0.38, heart: 0.08, flower: 0.14, star: 0.05, dust: 0.35 } },
-    'sage':         { density: 0.7,  speed: 0.8,  alpha: 0.45,
-                      mix: { rose: 0.4, heart: 0.07, flower: 0.2, star: 0.03, dust: 0.3 } },
-    'navy':         { density: 0.4,  speed: 0.6,  alpha: 0.55,
-                      mix: { rose: 0.1, heart: 0.04, flower: 0.06, star: 0.18, dust: 0.62 } },
-    'rose':         { density: 0.9,  speed: 0.85, alpha: 0.5,
-                      mix: { rose: 0.36, heart: 0.22, flower: 0.2, star: 0.04, dust: 0.18 } },
-    'truyen-thong': { density: 0.8,  speed: 0.95, alpha: 0.55,
-                      mix: { rose: 0.32, heart: 0.2, flower: 0.18, star: 0.08, dust: 0.22 } }
+    'hien-dai':     { density: 0.75, speed: 0.9,  alpha: 0.55,
+                      mix: { rose: 0.26, heart: 0.08, flower: 0.3, star: 0.16, dust: 0.2 } },
+    'sage':         { density: 0.9,  speed: 0.8,  alpha: 0.5,
+                      mix: { rose: 0.28, heart: 0.06, flower: 0.34, star: 0.12, dust: 0.2 } },
+    'navy':         { density: 0.6,  speed: 0.6,  alpha: 0.6,
+                      mix: { rose: 0.08, heart: 0.04, flower: 0.16, star: 0.36, dust: 0.36 } },
+    'rose':         { density: 1.1,  speed: 0.85, alpha: 0.55,
+                      mix: { rose: 0.26, heart: 0.16, flower: 0.32, star: 0.14, dust: 0.12 } },
+    'truyen-thong': { density: 1,    speed: 0.95, alpha: 0.6,
+                      mix: { rose: 0.24, heart: 0.16, flower: 0.28, star: 0.18, dust: 0.14 } }
   };
 
   let atm = null;
@@ -275,6 +275,14 @@
     for (const a of $$('[data-map]')) {
       const url = maps[a.getAttribute('data-map')];
       if (url) a.href = url;
+    }
+  }
+  // Embedded Google Maps: no API key needed; the pin sits on the venue's coordinates
+  function initMapEmbeds() {
+    const points = cfg.mapPoints || {};
+    for (const frame of $$('[data-map-embed]')) {
+      const p = points[frame.getAttribute('data-map-embed')];
+      if (p) frame.src = 'https://maps.google.com/maps?q=' + p.lat + ',' + p.lng + '&z=16&hl=vi&output=embed';
     }
   }
   function initGift() {
@@ -794,12 +802,12 @@
     const budget = () => {
       const area = state.w * state.h;
       const mobile = state.w < 640;
-      return Math.round(Math.min(mobile ? 26 : 58, (area / 26000) * state.cfg.density));
+      return Math.round(Math.min(mobile ? 35 : 49, (area / 17000) * state.cfg.density * (mobile ? 1.6 : 0.7)));
     };
     // Size range (radius in px) per shape
     const SIZE = {
-      dust: [0.8, 2.2], heart: [3.4, 6.4], rose: [4, 8.4],
-      star: [3.8, 6.8], flower: [4, 7.2]
+      dust: [0.9, 2.4], heart: [4.6, 8.6], rose: [5.4, 11.2],
+      star: [5.2, 9.4], flower: [5.6, 10]
     };
     // Weighted pick from the theme's mix; poppableOnly leaves out dust
     const pickShape = (poppableOnly) => {
@@ -827,7 +835,7 @@
         vr: rand(-0.25, 0.25),
         flip: rand(0, Math.PI * 2),
         flipSpeed: rand(0.1, 0.26),
-        a: dust ? rand(0.25, 0.7) : rand(0.26, 0.56)
+        a: dust ? rand(0.3, 0.75) : rand(0.36, 0.7)
       };
     };
     const fill = (init) => {
@@ -958,7 +966,7 @@
 
     // The canvas sits behind the page and ignores the pointer, so falling petals and hearts
     // are hit-tested by hand. The slop makes the small, drifting shapes easy to catch.
-    const HIT_SLOP = { mouse: 16, touch: 28 };
+    const HIT_SLOP = { mouse: 20, touch: 34 };
     const INTERACTIVE = 'a, button, input, textarea, select, label, summary';
     const shapeAt = (x, y, slop) => {
       let best = null, bestDist = slop;
@@ -980,7 +988,7 @@
         const shape = BURST_SHAPES[i % BURST_SHAPES.length];
         state.bursts.push({ shape,
           x: it.x, y: it.y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, drag: 1.7,
-          r: shape === 'dust' ? rand(1.2, 2.6) : rand(3.6, 8.2), rot: rand(0, 6), vr: rand(-4, 4), flip: rand(0, 6),
+          r: shape === 'dust' ? rand(1.3, 2.8) : rand(4.8, 11), rot: rand(0, 6), vr: rand(-4, 4), flip: rand(0, 6),
           life: rand(.9, 1.7), max: 1.7 });
       }
       state.items.splice(state.items.indexOf(it), 1);
@@ -1008,7 +1016,7 @@
           const ang = rand(-Math.PI, 0), sp = rand(60, 165);
           state.bursts.push({ shape: i % 3 === 0 ? 'heart' : 'rose',
             x: cx, y: cy, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
-            r: rand(3.4, 6.5), rot: rand(0, 6), vr: rand(-3, 3), flip: rand(0, 6),
+            r: rand(4.6, 8.6), rot: rand(0, 6), vr: rand(-3, 3), flip: rand(0, 6),
             life: rand(.8, 1.5), max: 1.5 });
         }
         return;
@@ -1076,15 +1084,15 @@
     return { available: true, play };
   })();
 
-  /* ===== Opening envelope: tap the wax seal (music on) or the quiet link; shown once per browser session ===== */
+  /* ===== Opening: two curtains. Tap the button (music on) or the quiet link; shown once per browser session. ===== */
   function initIntro() {
     const intro = $('#intro');
     if (!intro || !root.classList.contains('intro-on')) return;
-    const seal = $('#intro-open', intro), quiet = $('#intro-silent', intro);
+    const button = $('#intro-open', intro), quiet = $('#intro-silent', intro);
     if (music.available) quiet.hidden = false;
     // A reload can restore a scroll position far down the page; the invitation should open at the top
     scrollTo(0, 0);
-    seal.focus({ preventScroll: true });
+    button.focus({ preventScroll: true });
     let opened = false;
     const open = (withMusic) => {
       if (opened) return;
@@ -1093,11 +1101,31 @@
       if (withMusic) music.play();
       if (reducedMotion) { root.classList.remove('intro-on'); return; }
       intro.classList.add('is-opening');
-      // Words fade (.55s), then the curtains part (.5s delay + 1.25s)
-      setTimeout(() => root.classList.remove('intro-on'), 1900);
+      // The words fade, the curtains slide out and fade together (.3s delay + 1.7s); the hero rises meanwhile
+      setTimeout(() => root.classList.add('intro-reveal'), 350);
+      setTimeout(() => root.classList.remove('intro-on', 'intro-reveal'), 2200);
     };
-    seal.addEventListener('click', () => open(true));
+    button.addEventListener('click', () => open(true));
     quiet.addEventListener('click', () => open(false));
+  }
+
+  /* ===== Floating RSVP pill (computers): shown after the hero, hidden while the RSVP form is on screen ===== */
+  function initActionBar() {
+    const bar = $('.wed-bar'), form = $('#xac-nhan');
+    if (!bar || !form) return;
+    let formInView = false;
+    // is-away: computers hide the pill near the top and over the form; in-form: phones hide it only over the form
+    const update = () => {
+      bar.classList.toggle('is-away', formInView || scrollY < innerHeight * 0.6);
+      bar.classList.toggle('in-form', formInView);
+    };
+    new IntersectionObserver((entries) => {
+      formInView = entries[0].isIntersecting;
+      update();
+    }, { threshold: 0.2 }).observe(form);
+    addEventListener('scroll', update, { passive: true });
+    addEventListener('resize', update, { passive: true });
+    update();
   }
 
   /* ===== Story photos drift slightly against the scroll ===== */
@@ -1124,10 +1152,12 @@
 
   initThemes();
   initIntro();
+  initActionBar();
   initSections();
   initPhotos();
   initParallax();
   initMaps();
+  initMapEmbeds();
   initGift();
   initPopovers();
   initPresets();

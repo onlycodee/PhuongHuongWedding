@@ -39,6 +39,7 @@
 .wed-game-list{list-style:none;max-width:460px;margin:0 auto;padding:0;display:grid;gap:6px}
 .wed-game-li{display:flex;align-items:center;gap:14px;padding:11px 16px;border:1px solid var(--color-divider);border-radius:var(--radius-md);background:color-mix(in srgb,var(--color-bg) 70%,transparent)}
 .wed-game-li.is-me{border-color:var(--color-accent);background:var(--color-accent-100)}
+.wed-game-empty{padding:18px 16px;text-align:center;font-family:var(--font-heading);font-style:italic;color:var(--wed-soft)}
 .wed-game-rank{width:22px;font-family:var(--font-heading);font-size:18px;color:var(--color-accent-700)}
 .wed-game-who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wed-game-pts{font-variant-numeric:tabular-nums;font-weight:500}
@@ -65,7 +66,7 @@
 .wed-game-lab-chips{display:grid;gap:6px;margin:10px 0}
 .wed-game-lab .wed-theme-chip{text-align:left;width:100%}
 .wed-game-lab .btn{width:100%;min-height:42px;margin-bottom:6px}
-@media (max-width:860px){.wed-game-lab{bottom:calc(84px + env(safe-area-inset-bottom))}}
+@media (max-width:860px){.wed-game-lab{bottom:calc(98px + env(safe-area-inset-bottom))}}
 
 @keyframes wed-lure-path{0%{opacity:0;transform:translate(var(--x0),var(--y0))}8%,90%{opacity:1}100%{opacity:0;transform:translate(var(--x1),var(--y1))}}
 @keyframes wed-lure-sway{from{transform:translateX(-24px) rotate(-12deg)}to{transform:translateX(24px) rotate(12deg)}}

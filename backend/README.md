@@ -1,6 +1,6 @@
 # Backend setup — Google Sheet + Apps Script
 
-RSVPs and guestbook wishes are stored in a Google Sheet. A small Apps Script web app
+RSVPs, guestbook wishes and the hidden game's leaderboard are stored in a Google Sheet. A small Apps Script web app
 (`Code.gs`) is the only "server". It is free and takes about five minutes to set up.
 
 ## One-time setup
@@ -15,7 +15,7 @@ RSVPs and guestbook wishes are stored in a Google Sheet. A small Apps Script web
    (it ends with `/exec`).
 6. Paste that URL into `apiEndpoint` in [`js/config.js`](../js/config.js), commit and push.
 
-The `RSVP` and `Wishes` tabs are created automatically on the first submission.
+The `RSVP`, `Wishes` and `Scores` tabs are created automatically on first use.
 
 ## Day-to-day
 
@@ -28,6 +28,9 @@ The `RSVP` and `Wishes` tabs are created automatically on the first submission.
   `compareWishes` in `Code.gs`. A wish is linked to its author's RSVP through the `Guest ID`
   column (one anonymous ID per browser), so a wish sent from a different device than the RSVP
   ranks as "not confirmed".
+- **Game leaderboard ("Bảng vàng"):** the `Scores` tab has one row per guest and game with their best score. Type
+  anything in its `Hidden` column to take a score off the board. The least score that earns a place (`GAME_GOALS`)
+  must match the goals in `js/game.js`.
 - **Add a wish by hand:** add a row to `Wishes` (the `Message` column must not be empty).
 
 ## Changing the script later
@@ -39,7 +42,7 @@ would have to paste into `js/config.js` again.
 
 ## Limits and privacy
 
-- The website only ever reads the wish list (name, relation, message, date).
+- The website only ever reads the wish list (name, relation, message, date) and the leaderboard (name, score).
   RSVP data is never exposed by the script.
 - Quotas on a free Gmail account are far beyond what a wedding needs. Google documents no
   daily cap on web app requests; the limit that matters is 30 requests running at the same

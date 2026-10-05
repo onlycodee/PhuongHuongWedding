@@ -1,15 +1,18 @@
 /**
  * PhuongHuongWedding backend — Google Apps Script bound to a Google Sheet.
  *
- * Stores RSVPs and guestbook wishes in two tabs of the spreadsheet and serves
- * the public wish list back to the website. Setup steps are in backend/README.md.
+ * Stores RSVPs, guestbook wishes and the hidden game's leaderboard ("Bảng vàng") in three tabs of the
+ * spreadsheet and serves the public wish list and leaderboard back to the website.
+ * Setup steps are in backend/README.md.
  *
  *   POST type=rsvp  → upsert one row in "RSVP" (keyed by guestId); a non-empty
  *                     note is also added to "Wishes"
  *   POST type=wish  → append one row to "Wishes"
+ *   POST type=score → save a game score in "Scores" (one row per guest and game, best score kept)
  *   GET  ?action=wishes → JSON list of visible wishes, in guestbook order (see compareWishes)
+ *   GET  ?action=scores → JSON top scores for every game (see listScores)
  *
- * Moderation: type anything in the "Hidden" column of a wish to take it off the site.
+ * Moderation: type anything in the "Hidden" column of a wish or of a score to take it off the site.
  */
 
 const SHEETS = {
@@ -20,14 +23,21 @@ const SHEETS = {
   wishes: {
     name: 'Wishes',
     header: ['Created at', 'Name', 'Relation', 'Message', 'Source', 'Hidden', 'Guest ID']
+  },
+  scores: {
+    name: 'Scores',
+    header: ['Created at', 'Name', 'Game', 'Score', 'Guest ID', 'Hidden']
   }
 };
 const TIME_ZONE = 'Asia/Ho_Chi_Minh';
-const LIMITS = { name: 80, relation: 80, message: 500, events: 300, wishesReturned: 200 };
+const LIMITS = { name: 80, relation: 80, message: 500, events: 300, wishesReturned: 200, scoreMax: 5000, scoresPerGame: 10 };
+// Game id → the least score that earns a place on the board. Keep in step with MODES (goal) in js/game.js.
+const GAME_GOALS = { rush: 60, chase: 12, match: 12, keepup: 10 };
 
 function doGet(e) {
   const action = (e.parameter.action || '').toLowerCase();
   if (action === 'wishes') return json({ ok: true, wishes: listWishes() });
+  if (action === 'scores') return json({ ok: true, scores: listScores(e.parameter.guestId) });
   return json({ ok: true, service: 'PhuongHuongWedding' });
 }
 
@@ -41,6 +51,7 @@ function doPost(e) {
   try {
     if (p.type === 'rsvp') return json(saveRsvp(p));
     if (p.type === 'wish') return json(saveWish(p));
+    if (p.type === 'score') return json(saveScore(p));
     return json({ ok: false, error: 'Unknown type' });
   } catch (err) {
     return json({ ok: false, error: String(err && err.message || err) });
@@ -85,6 +96,64 @@ function saveWish(p) {
   getSheet(SHEETS.wishes).appendRow(
     [new Date(), name, clean(p.relation, LIMITS.relation), message, 'guestbook', '', clean(p.guestId, 64)]);
   return { ok: true };
+}
+
+/**
+ * Saves a game score. A guest (browser) keeps ONE row per game with their best score, so the board
+ * cannot be filled by replaying; scores below the game's goal or above a sane maximum are refused.
+ */
+function saveScore(p) {
+  const mode = String(p.mode || '');
+  const score = parseInt(p.score, 10);
+  if (!Object.prototype.hasOwnProperty.call(GAME_GOALS, mode)) return { ok: false, error: 'Unknown game' };
+  if (!(score >= GAME_GOALS[mode]) || score > LIMITS.scoreMax) return { ok: false, error: 'Score out of range' };
+  const name = clean(p.name, LIMITS.name) || 'Khách mời';
+  const guestId = clean(p.guestId, 64);
+
+  const sheet = getSheet(SHEETS.scores);
+  const last = sheet.getLastRow();
+  if (guestId && last > 1) {
+    const rows = sheet.getRange(2, 1, last - 1, SHEETS.scores.header.length).getValues();
+    for (let i = 0; i < rows.length; i++) {
+      if (String(rows[i][4]) !== guestId || rows[i][2] !== mode) continue;
+      const rowIndex = i + 2, best = Number(rows[i][3]);
+      if (score > best) sheet.getRange(rowIndex, 1, 1, 5).setValues([[new Date(), name, mode, score, guestId]]);
+      else sheet.getRange(rowIndex, 2).setValue(name);
+      return { ok: true, best: Math.max(score, best) };
+    }
+  }
+  sheet.appendRow([new Date(), name, mode, score, guestId, '']);
+  return { ok: true, best: score };
+}
+
+/**
+ * Top scores per game, best first (an earlier score wins a tie). `mine` marks the caller's own row when the
+ * website passes its anonymous guest ID; IDs themselves are never sent out.
+ */
+function listScores(guestId) {
+  const out = {};
+  Object.keys(GAME_GOALS).forEach(function (m) { out[m] = []; });
+  const sheet = getSheet(SHEETS.scores);
+  const last = sheet.getLastRow();
+  if (last < 2) return out;
+  const rows = sheet.getRange(2, 1, last - 1, SHEETS.scores.header.length).getValues();
+  const byGame = {};
+  for (const r of rows) {
+    if (r[5] || !Object.prototype.hasOwnProperty.call(GAME_GOALS, r[2])) continue; // hidden, or unknown game
+    (byGame[r[2]] = byGame[r[2]] || []).push({
+      name: String(r[1]),
+      score: Number(r[3]),
+      time: r[0] instanceof Date ? r[0].getTime() : 0,
+      mine: Boolean(guestId) && String(r[4]) === String(guestId)
+    });
+  }
+  Object.keys(byGame).forEach(function (m) {
+    byGame[m].sort(function (a, b) { return (b.score - a.score) || (a.time - b.time); });
+    out[m] = byGame[m].slice(0, LIMITS.scoresPerGame).map(function (x) {
+      return { name: x.name, score: x.score, mine: x.mine };
+    });
+  });
+  return out;
 }
 
 /**

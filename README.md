@@ -56,4 +56,5 @@ without a backend.
 ## Deploy to GitHub Pages
 
 Repo **Settings → Pages → Deploy from a branch → `master` / `(root)`**. The site is then served at
-`https://onlycodee.github.io/PhuongHuongWedding/`. GitHub Pages on a free plan needs a public repo.
+`https://phuonghuongwedding.online/` (custom domain; the `CNAME` file in the repo root holds it, and the domain's DNS has four `A` records for `185.199.108.153` … `185.199.111.153` plus a `www` CNAME to `onlycodee.github.io`).
+GitHub Pages on a free plan needs a public repo. Do not remove the domain's DNS records: `onlycodee.github.io/PhuongHuongWedding/` redirects to it.

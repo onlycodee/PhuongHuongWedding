@@ -35,7 +35,7 @@ without a backend.
 | `css/wedding.css` | The five palettes and the page layout |
 | `calendar/*.ics` | One calendar file per event (must keep CRLF line endings — see `.gitattributes`) |
 | `backend/Code.gs` | Apps Script that writes to the Google Sheet and serves the wish list |
-| `assets/photos/` | Wedding photos, QR codes, map screenshots, `share.jpg` (the 1200×630 link preview) |
+| `assets/photos/` | Wedding photos, QR codes, map screenshots, `share-2.jpg` (the 1200×630 link preview) |
 | `assets/audio/song.mp3` | Background music, started by the tap on the opening seal |
 
 ## Before sending the invitation

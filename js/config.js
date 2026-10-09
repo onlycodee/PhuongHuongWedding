@@ -21,7 +21,7 @@ window.WEDDING_CONFIG = {
   game: { enabled: true, mode: 'random', lab: true },
 
   // Wedding ceremony time, used by the countdown
-  weddingTime: '2026-10-18T11:00:00+07:00',
+  weddingTime: '2026-10-18T10:00:00+07:00',
 
   // Google Apps Script web app URL (ends with /exec) that stores RSVPs and wishes
   // in a Google Sheet — see backend/README.md. While this is empty the site runs in
@@ -42,7 +42,6 @@ window.WEDDING_CONFIG = {
     'wed-hero': 'assets/photos/hero.webp',
     'wed-groom': 'assets/photos/groom.webp',
     'wed-bride': 'assets/photos/bride.webp',
-    'wed-story-bv-1': 'assets/photos/story-bv-1.webp',
     'wed-story-chay-1': 'assets/photos/story-chay-1.webp',
     'wed-story-chay-2': 'assets/photos/story-chay-2.webp',
     'wed-story-chay-3': 'assets/photos/story-chay-3.webp',
@@ -50,6 +49,7 @@ window.WEDDING_CONFIG = {
     'wed-story-chay-5': 'assets/photos/story-chay-5.webp',
     'wed-story-chay-6': 'assets/photos/story-chay-6.webp',
     'wed-story-chay-7': 'assets/photos/story-chay-7.webp',
+    'wed-story-chay-8': 'assets/photos/story-chay-8.webp',
     'wed-story-hg-1': 'assets/photos/story-hg-1.webp',
     'wed-story-hg-2': 'assets/photos/story-hg-2.webp',
     'wed-story-hg-3': 'assets/photos/story-hg-3.webp',
@@ -84,6 +84,7 @@ window.WEDDING_CONFIG = {
     'wed-g10': 'assets/photos/album-10.webp',
     'wed-g11': 'assets/photos/album-11.webp',
     'wed-g12': 'assets/photos/album-12.webp',
+    'wed-g13': 'assets/photos/album-13.webp',
     'wed-qr-groom': 'assets/photos/qr-groom.webp',
     'wed-qr-bride': 'assets/photos/qr-bride.webp'
   },

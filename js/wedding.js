@@ -311,7 +311,7 @@
     const cells = {};
     for (const el of $$('[data-cd]')) cells[el.getAttribute('data-cd')] = el;
     if (!cells.d) return;
-    const target = new Date(cfg.weddingTime || '2026-10-18T11:00:00+07:00').getTime();
+    const target = new Date(cfg.weddingTime || '2026-10-18T10:00:00+07:00').getTime();
     const p = (n) => String(n).padStart(2, '0');
     let timer = 0;
     const tick = () => {

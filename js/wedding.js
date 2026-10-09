@@ -83,7 +83,7 @@
       if (!slot.hasAttribute('data-eager')) img.loading = 'lazy';
       img.addEventListener('load', () => {
         slot.classList.add('is-filled');
-        if (!slot.classList.contains('wed-slot--qr')) lightbox.add(slot, src, img.alt);
+        lightbox.add(slot, src, img.alt);
       });
       img.addEventListener('error', () => img.remove());
       img.src = src;
@@ -1128,34 +1128,11 @@
     update();
   }
 
-  /* ===== Story photos drift slightly against the scroll ===== */
-  function initParallax() {
-    const slots = $$('.wed-story .wed-slot');
-    if (reducedMotion || !slots.length) return;
-    slots.forEach((s) => s.classList.add('wed-par'));
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      for (const s of slots) {
-        const r = s.getBoundingClientRect();
-        if (r.bottom < -80 || r.top > innerHeight + 80) continue;
-        // -1 when the photo is entering from below, +1 when it leaves at the top
-        const p = (r.top + r.height / 2 - innerHeight / 2) / (innerHeight / 2 + r.height / 2);
-        s.style.setProperty('--py', (-p * r.height * 0.06).toFixed(1) + 'px');
-      }
-    };
-    const queue = () => { if (!raf) raf = requestAnimationFrame(update); };
-    addEventListener('scroll', queue, { passive: true });
-    addEventListener('resize', queue, { passive: true });
-    update();
-  }
-
   initThemes();
   initIntro();
   initActionBar();
   initSections();
   initPhotos();
-  initParallax();
   initMaps();
   initMapEmbeds();
   initGift();

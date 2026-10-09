@@ -116,18 +116,16 @@ section[id]{scroll-margin-top:72px}
    True colours (classical.css tints plates sepia) with a tiny lift against WebP flatness.
    Depth comes from the frame, a soft vignette and a hover response, not from tinting the pixels. */
 .plate{filter:none;box-shadow:var(--shadow-md),0 18px 40px -22px color-mix(in srgb,var(--wed-primary-deep) 45%,transparent);transition:transform .35s ease,box-shadow .35s ease}
-/* --py / --sc let scroll parallax (.wed-par, set from js) and the hover zoom share one transform */
-.wed-slot img{filter:contrast(1.04) saturate(1.06);transform:translate3d(0,var(--py,0px),0) scale(var(--sc,1));transition:transform .5s ease,filter .35s ease}
+/* --sc drives the hover zoom */
+.wed-slot img{transform:scale(var(--sc,1));transition:transform .5s ease}
 .wed-slot.is-filled img{animation:wed-img-in .9s ease both}
 @keyframes wed-img-in{from{opacity:0}}
-.wed-par img{--sc:1.14;transition:filter .35s ease}
 .wed-slot.is-filled::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 clamp(24px,5vw,64px) color-mix(in srgb,var(--wed-primary-deep) 16%,transparent)}
 .wed-slot--qr img{filter:none}
 .wed-slot--qr::after{display:none}
 @media (hover:hover){
   .plate:has(.is-zoomable):hover{transform:translateY(-3px);box-shadow:var(--shadow-lg),0 30px 54px -24px color-mix(in srgb,var(--wed-primary-deep) 55%,transparent)}
-  .plate:has(.is-zoomable):hover .wed-slot img{--sc:1.035;filter:contrast(1.04) saturate(1.06) brightness(1.03)}
-  .plate:has(.is-zoomable):hover .wed-slot.wed-par img{--sc:1.17}
+  .plate:has(.is-zoomable):hover .wed-slot img{--sc:1.035}
 }
 @media (prefers-reduced-motion:reduce){
   .plate,.wed-slot img{transition:none}
@@ -164,7 +162,7 @@ section[id]{scroll-margin-top:72px}
 .wed-slot img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover}
 .wed-slot-cap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-size:13px;line-height:1.3;font-weight:500;letter-spacing:.01em;color:color-mix(in srgb,currentColor 75%,transparent);border:1.5px dashed color-mix(in srgb,currentColor 35%,transparent)}
 .wed-slot.is-filled .wed-slot-cap{display:none}
-.wed-slot--qr{width:124px;height:124px;flex:none;border-radius:4px}
+.wed-slot--qr{width:clamp(150px,18vw,184px);height:auto;flex:none;border-radius:4px}
 .wed-slot--qr .wed-slot-cap{border-radius:4px}
 .wed-slot--qr img{object-fit:contain}
 
@@ -224,7 +222,7 @@ section[id]{scroll-margin-top:72px}
 .wed-hero-frame::after{content:"";position:absolute;inset:10px;border:1px solid color-mix(in srgb,#fff 62%,transparent);border-radius:999px 999px 3px 3px;pointer-events:none;z-index:1}
 .wed-hero-photo::before{content:"";position:absolute;inset:-14px;border:1px solid var(--color-accent-2);border-radius:999px 999px 10px 10px;opacity:.65;pointer-events:none}
 .wed-hero-frame .wed-slot{position:absolute;inset:0;height:100%;aspect-ratio:auto!important}
-.wed-hero-frame .wed-slot img{object-position:50% 24%}
+.wed-hero-frame .wed-slot img{object-position:50% 0%}
 .wed-hero-frame .wed-slot.is-filled::after{box-shadow:none}
 .wed-hero-text .wed-name{font-size:min(20cqw,108px);margin:2px 0 0}
 .wed-hero-kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700);font-feature-settings:'tnum' 1;margin:0 0 20px}
@@ -243,7 +241,7 @@ section[id]{scroll-margin-top:72px}
   .wed-hero-photo::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,color-mix(in srgb,var(--wed-primary-deep) 94%,transparent) 0,color-mix(in srgb,var(--wed-primary-deep) 78%,transparent) 30%,color-mix(in srgb,var(--wed-primary-deep) 18%,transparent) 62%,transparent 80%)}
   .wed-hero-frame{border:0;border-radius:0;box-shadow:none}
   .wed-hero-frame::after{inset:14px;border-radius:0;border-color:color-mix(in srgb,var(--wed-dark-gold) 55%,transparent)}
-  .wed-hero-frame .wed-slot img{object-position:50% 22%}
+  .wed-hero-frame .wed-slot img{object-position:50% 0%}
   .wed-hero-text{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:calc(100svh - 68px);max-width:none;padding:0 clamp(26px,7vw,48px) 112px;color:var(--wed-dark-ink)}
   .wed-hero-text .wed-name{font-size:min(19cqw,84px);text-shadow:0 2px 24px rgba(40,8,18,.55)}
   .wed-hero-text .wed-amp{color:var(--wed-dark-gold)}
@@ -315,36 +313,26 @@ section[id]{scroll-margin-top:72px}
 .wed-parents dd{margin:0}
 
 /* ===== Our story ===== */
-.wed-story{position:relative;display:grid;gap:clamp(34px,5vw,64px)}
-.wed-story::before{content:"";position:absolute;left:50%;top:6px;bottom:6px;width:1px;background:linear-gradient(to bottom,transparent,var(--color-divider) 8%,var(--color-divider) 92%,transparent)}
-.wed-story-row{display:grid;grid-template-columns:1fr 64px 1fr;align-items:center}
+.wed-story{--story-gap:clamp(34px,5vw,64px);position:relative;display:grid;gap:var(--story-gap)}
+.wed-story::before{display:none;content:"";position:absolute;left:50%;top:6px;bottom:6px;width:1px;background:linear-gradient(to bottom,transparent,var(--color-divider) 8%,var(--color-divider) 92%,transparent)}
+.wed-story-row{position:relative;display:grid;grid-template-columns:1fr 64px 1fr;align-items:center}
+.wed-story-row::before{content:"";position:absolute;left:50%;top:calc(var(--story-gap) / -2);bottom:calc(var(--story-gap) / -2);width:1px;background:var(--color-divider);pointer-events:none}
 .wed-story-row > .wed-story-pics{grid-column:1}
-.wed-story-pics{display:grid;gap:clamp(8px,1.4vw,14px)}
-.wed-story-pics > figure{margin:0;min-width:0;min-height:0}
-.wed-story-pics .wed-slot{aspect-ratio:3/4}
-.wed-story-pics .wed-slot img{object-position:50% 40%}
-.wed-story-pics--2{grid-template-columns:1fr 1fr;align-items:start}
-.wed-story-pics--2 > figure:nth-child(2){margin-top:clamp(20px,4vw,48px)}
-.wed-story-pics--3{grid-template-columns:3fr 2fr;grid-template-rows:1fr 1fr;aspect-ratio:5/4}
-.wed-story-pics--3 > figure{height:100%}
-.wed-story-pics--3 > figure:first-child{grid-row:1/3}
-.wed-story-pics--3 .wed-slot{height:100%;aspect-ratio:auto}
-.wed-story-pics--4{grid-template-columns:1fr 1fr;align-items:start}
-.wed-story-pics--4 .wed-slot{aspect-ratio:1/1}
-.wed-story-pics--4 > figure:nth-child(even){margin-top:clamp(14px,2.4vw,28px)}
-.wed-story-pics--5{grid-template-columns:repeat(6,1fr);align-items:start}
-.wed-story-pics--5 > figure:nth-child(1){grid-column:1/5;grid-row:1/3;height:100%}
-.wed-story-pics--5 > figure:nth-child(1) .wed-slot{height:100%;aspect-ratio:auto}
-.wed-story-pics--5 > figure:nth-child(2){grid-column:5/7;grid-row:1}
-.wed-story-pics--5 > figure:nth-child(3){grid-column:5/7;grid-row:2}
-.wed-story-pics--5 > figure:nth-child(4){grid-column:1/4;grid-row:3}
-.wed-story-pics--5 > figure:nth-child(5){grid-column:4/7;grid-row:3}
-.wed-story-pics--5 > figure:nth-child(n+4) .wed-slot{aspect-ratio:1/1}
+.wed-story-pics{column-gap:clamp(8px,1.4vw,14px);column-count:2}
+.wed-story-pics > figure{margin:0 0 clamp(8px,1.4vw,14px);break-inside:avoid}
+.wed-story-pics--1{column-count:1;max-width:min(100%,340px)}
+.wed-story-pics--wide{display:contents}
+.wed-story-col{display:flex;flex-direction:column;gap:clamp(8px,1.4vw,14px);min-width:0}
 .wed-story-text{grid-column:3;text-align:left}
 .wed-story-alt > .wed-story-pics{grid-column:3}
 .wed-story-alt .wed-story-text{grid-column:1;text-align:right}
 .wed-story-row > .wed-story-pics,.wed-story-text{grid-row:1}
 .wed-story-row::after{content:"";grid-column:2;grid-row:1;justify-self:center;width:9px;height:9px;transform:rotate(45deg);background:var(--color-bg);border:1px solid var(--color-accent-2);box-shadow:0 0 0 5px var(--color-bg)}
+.wed-story-row--wide{align-items:start;row-gap:clamp(18px,3vw,30px)}
+.wed-story-row--wide::after{align-self:center}
+.wed-story-row--wide > .wed-story-text{grid-column:3;grid-row:1;text-align:left;align-self:center}
+.wed-story-row--wide .wed-story-col:nth-child(1){grid-column:1;grid-row:2}
+.wed-story-row--wide .wed-story-col:nth-child(2){grid-column:3;grid-row:2}
 .wed-story-year{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-feature-settings:'tnum' 1;color:var(--color-accent-700);margin:0 0 10px}
 .wed-story-title{font-family:var(--font-heading);font-weight:400;font-size:clamp(24px,2.4vw,32px);line-height:1.2;margin:0 0 10px}
 .wed-story-body{font-size:15.5px;line-height:1.75;color:var(--wed-soft);margin:0;max-width:40ch}
@@ -372,21 +360,14 @@ section[id]{scroll-margin-top:72px}
 .wed-tl-actions{gap:10px}
 
 /* ===== Album ===== */
-/* One wide photo and three portraits: a single row of five tracks on wide screens,
-   the wide one on its own row above the three on tablets, a column on phones */
+/* One landscape across the top, then portraits three to a row; the last two share a row at half width each. Phones get a single column. */
 .wed-album{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(14px,2vw,26px);align-items:start}
 .wed-album > figure{margin:0}
 @media (min-width:560px){
-  .wed-album{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .wed-album > .wed-wide{grid-column:1 / -1}
-}
-/* Wide screens, six tracks: a 3:2 landscape over four tracks is as tall as a 3:4 portrait over two,
-   so rows stay level; "--full" landscapes take the whole row. Dense packing fills any gaps. */
-@media (min-width:960px){
-  .wed-album{grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-flow:dense}
+  .wed-album{grid-template-columns:repeat(6,minmax(0,1fr))}
   .wed-album > figure{grid-column:span 2}
-  .wed-album > .wed-wide{grid-column:span 4}
-  .wed-album > .wed-wide--full{grid-column:1 / -1}
+  .wed-album > .wed-half{grid-column:span 3}
+  .wed-album > .wed-wide{grid-column:1 / -1}
 }
 
 /* ===== Quote ===== */
@@ -549,7 +530,7 @@ section[id]{scroll-margin-top:72px}
 
 /* ===== Deep bands: give the page a light / dark rhythm ===== */
 .wed-dark{position:relative;color:var(--wed-dark-ink);border-color:transparent;background:radial-gradient(120% 170% at 50% -30%,color-mix(in srgb,var(--wed-primary) 78%,var(--wed-primary-deep)),var(--wed-primary-deep) 58%,color-mix(in srgb,var(--wed-primary-deep) 66%,#000))}
-.wed-dark--photo{background:linear-gradient(180deg,color-mix(in srgb,var(--wed-primary-deep) 94%,transparent),color-mix(in srgb,var(--wed-primary-deep) 88%,transparent)),url("../assets/photos/album-7.webp") center 25%/cover}
+.wed-dark--photo{background:linear-gradient(180deg,color-mix(in srgb,var(--wed-primary-deep) 94%,transparent),color-mix(in srgb,var(--wed-primary-deep) 88%,transparent)),url("../assets/photos/quote-bg.webp") center 62%/cover}
 .wed-dark .wed-kicker,.wed-dark .wed-cd-kicker{color:var(--wed-dark-gold)}
 .wed-dark .wed-cd-rule{background:linear-gradient(to right,transparent,var(--wed-dark-gold))}
 .wed-dark .wed-cd-kicker > .wed-cd-rule:last-child{background:linear-gradient(to left,transparent,var(--wed-dark-gold))}
@@ -569,7 +550,7 @@ section[id]{scroll-margin-top:72px}
 .wed-footer .wed-amp{color:var(--wed-dark-gold);margin:0 .12em}
 .wed-footer-note{color:color-mix(in srgb,var(--wed-dark-ink) 72%,transparent)}
 /* Softly tinted band so the light sections do not all look the same */
-.wed-tint{background:color-mix(in srgb,var(--wed-surface) 52%,transparent)}
+.wed-tint{background:color-mix(in srgb,var(--wed-surface) 30%,transparent)}
 
 /* ===== Section details ===== */
 /* Timeline diamonds light up once their row has been revealed */
@@ -659,9 +640,12 @@ section[id]{scroll-margin-top:72px}
 }
 @media (max-width:820px){
   .wed-story{gap:30px}
-  .wed-story::before,.wed-story-row::after{display:none}
+  .wed-story::before,.wed-story-row::before,.wed-story-row::after{display:none!important}
   .wed-story-row,.wed-story-alt{grid-template-columns:minmax(0,1fr);gap:16px}
   .wed-story-row > .wed-story-pics,.wed-story-alt > .wed-story-pics{grid-column:1;grid-row:1}
+  .wed-story-pics--wide{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(8px,1.4vw,14px);grid-column:1;grid-row:2;align-items:start}
+  .wed-story-row--wide > .wed-story-text{grid-column:1;grid-row:1;text-align:center}
+  .wed-story-row--wide .wed-story-col{grid-column:auto;grid-row:auto}
   .wed-story-text,.wed-story-alt .wed-story-text{grid-column:1;grid-row:2;text-align:center}
   .wed-story-body,.wed-story-alt .wed-story-body{margin:0 auto}
 }

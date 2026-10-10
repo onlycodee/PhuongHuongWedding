@@ -247,10 +247,9 @@ section[id]{scroll-margin-top:72px}
   .wed-hero-frame::after{inset:14px;border-radius:0;border-color:color-mix(in srgb,var(--wed-dark-gold) 55%,transparent)}
   /* the photo is larger and anchored at the bottom, so the couple's faces sit in the top part of the screen
      (above the names) on short browser windows such as Safari with its toolbars, with no gap at the bottom */
-  .wed-hero-frame{background:linear-gradient(to bottom,#08120a 30%,var(--wed-primary-deep) 80%)}
-  /* the photo spans the full width (no side crop), sits a little lower so the groom's hair clears the top, and fades
-     into the photo's dark green above and into the deep colour under the names */
-  .wed-hero-frame .wed-slot{top:44px;bottom:auto;height:min(calc(100% - 44px),150vw);--fade:linear-gradient(to bottom,transparent,#000 50px,#000 78%,transparent);-webkit-mask-image:var(--fade);mask-image:var(--fade)}
+  .wed-hero-frame{background:var(--wed-primary-deep)}
+  /* the photo spans the full width (no side crop) and fades into the deep colour under the names */
+  .wed-hero-frame .wed-slot{top:0;bottom:auto;height:min(100%,150vw);-webkit-mask-image:linear-gradient(to bottom,#000 78%,transparent);mask-image:linear-gradient(to bottom,#000 78%,transparent)}
   .wed-hero-frame .wed-slot img{--sc:1;transform-origin:50% 100%;object-position:50% 0%}
   .wed-hero-text{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:calc(100svh - 144px);max-width:none;padding:0 clamp(26px,7vw,48px) 40px;color:var(--wed-dark-ink)}
   .wed-hero-text .wed-name{font-size:min(19cqw,84px,8.6svh);text-shadow:0 2px 24px rgba(40,8,18,.55)}
@@ -265,7 +264,6 @@ section[id]{scroll-margin-top:72px}
   @media (max-height:640px){
     .wed-hero,.wed-hero-text{min-height:max(calc(100svh - 68px),540px)}
     .wed-hero-text{padding-bottom:92px}
-    .wed-hero-frame .wed-slot{top:16px;height:min(calc(100% - 16px),150vw)}
     .wed-hero-text .wed-name{font-size:min(19cqw,84px,7.4svh)}
     .wed-hero-text .wed-amp{font-size:min(30px,5svh);margin-top:0}
     .wed-hero-date{margin-top:10px}

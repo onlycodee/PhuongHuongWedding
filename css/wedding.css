@@ -261,11 +261,11 @@ section[id]{scroll-margin-top:72px}
   .wed-hero-text .wed-lead{display:none}
   .wed-hero-actions{display:none}
   /* short phone windows (small iPhones, Safari toolbars): a tighter text block keeps it clear of the faces */
-  @media (max-height:640px){
-    .wed-hero,.wed-hero-text{min-height:max(calc(100svh - 68px),540px)}
-    .wed-hero-text{padding-bottom:92px}
+  @media (max-height:760px){
+    .wed-hero,.wed-hero-text{min-height:max(calc(100svh - 144px),520px)}
+    .wed-hero-text{padding-bottom:28px}
     .wed-hero-text .wed-name{font-size:min(19cqw,84px,7.4svh)}
-    .wed-hero-text .wed-amp{font-size:min(30px,5svh);margin-top:0}
+    .wed-hero-text .wed-amp{font-size:min(30px,5svh);margin-top:0;line-height:1}
     .wed-hero-date{margin-top:10px}
     .wed-hero-kicker{font-size:12px;margin-bottom:6px}
   }

@@ -241,10 +241,11 @@ section[id]{scroll-margin-top:72px}
   .wed-hero-photo::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,color-mix(in srgb,var(--wed-primary-deep) 94%,transparent) 0,color-mix(in srgb,var(--wed-primary-deep) 78%,transparent) 30%,color-mix(in srgb,var(--wed-primary-deep) 18%,transparent) 62%,transparent 80%)}
   .wed-hero-frame{border:0;border-radius:0;box-shadow:none}
   .wed-hero-frame::after{inset:14px;border-radius:0;border-color:color-mix(in srgb,var(--wed-dark-gold) 55%,transparent)}
-  /* the photo is a touch larger and anchored at the bottom, so the couple moves up with no gap */
-  .wed-hero-frame .wed-slot img{--sc:1.1;transform-origin:50% 100%;object-position:50% 0%}
+  /* the photo is larger and anchored at the bottom, so the couple's faces sit in the top part of the screen
+     (above the names) on short browser windows such as Safari with its toolbars, with no gap at the bottom */
+  .wed-hero-frame .wed-slot img{--sc:1.3;transform-origin:50% 100%;object-position:50% 0%}
   .wed-hero-text{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:calc(100svh - 68px);max-width:none;padding:0 clamp(26px,7vw,48px) 112px;color:var(--wed-dark-ink)}
-  .wed-hero-text .wed-name{font-size:min(19cqw,84px);text-shadow:0 2px 24px rgba(40,8,18,.55)}
+  .wed-hero-text .wed-name{font-size:min(19cqw,84px,8.6svh);text-shadow:0 2px 24px rgba(40,8,18,.55)}
   .wed-hero-text .wed-amp{color:var(--wed-dark-gold)}
   .wed-hero-kicker{color:var(--wed-dark-gold);margin-bottom:10px;text-shadow:0 1px 8px rgba(30,6,14,.55)}
   .wed-hero-date span{color:var(--wed-dark-ink)}
